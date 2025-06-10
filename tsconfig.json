@@ -1,0 +1,38 @@
+// tsconfig.json (na raiz do seu projeto)
+{
+  "compilerOptions": {
+    // Adicione esta linha: diz a este arquivo para não gerar saídas.
+    // Ele servirá apenas para type-checking e como base para outros tsconfig.
+    "noEmit": true,
+
+    // Configurações base que serão herdadas
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["renderer/src/*"] // Ajuste se sua pasta do Next.js for 'src/' em vez de 'renderer/src/'
+    }
+  },
+  "include": [
+    // Inclui os tipos globais para o Next.js e os arquivos de definição de tipo customizados
+    "renderer/next-env.d.ts", // Ajuste o caminho se necessário
+    "renderer/types/**/*.d.ts",
+    "main/types/**/*.d.ts" // Se você tiver tipos específicos do main
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".next", // Pasta de build do Next.js (do renderer)
+    "app"    // Pasta de build do Electron (do main)
+  ]
+}

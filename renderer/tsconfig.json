@@ -1,0 +1,25 @@
+// renderer/tsconfig.json
+{
+  "extends": "../tsconfig.json", // << Herda do arquivo base na raiz
+  "compilerOptions": {
+    "target": "ESNext", // Sobrescreve para usar a versão mais moderna do JS para o frontend
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true, // Next.js cuida da emissão de arquivos
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "types/**/*.d.ts" // Caminho simplificado para os tipos do renderer
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

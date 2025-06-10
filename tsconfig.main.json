@@ -1,0 +1,14 @@
+// tsconfig.main.json
+
+{
+  "extends": "./tsconfig.json", // Herda as configurações principais
+  "compilerOptions": {
+    "module": "commonjs", // Processo principal do Electron usa CommonJS
+    "outDir": "app",      // << IMPORTANTE: Diretório de saída para o JS compilado
+    "noEmit": false,      // Permite que o TypeScript gere arquivos de saída
+    "isolatedModules": false // Permite arquivos que não são módulos estritos
+  },
+  "include": [
+    "main" // Pasta que contém o código fonte do seu Main Process
+  ]
+}
