@@ -1,6 +1,7 @@
 'use client'
 
-import { WelcomeSection } from "./WelcomeSection/page"
+import { WelcomeSection } from "./components/layout/WelcomeSection"
+
 
 
 

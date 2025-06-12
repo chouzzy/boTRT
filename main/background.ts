@@ -23,8 +23,8 @@ if (isProd) {
     resizable: true,
     closable: true,
     simpleFullscreen: true,
-    minHeight: 920,
-    minWidth: 720,
+    minHeight: 720,
+    minWidth: 1280,
     center: true,
     frame: false, // Remove a moldura padrão da janela (incluindo a barra de título)
     titleBarStyle: 'hidden', // No macOS, isso esconde a barra de título mas mantém os botões de "semáforo"
@@ -38,10 +38,7 @@ if (isProd) {
     },
   });
 
-
-  // 2. Maximiza a janela enquanto ela ainda está oculta
-  mainWindow.maximize();
-
+  mainWindow.maximize(); // 1. Maximiza a janela principal
   // 3. Mostra a janela, já maximizada, para o usuário
   mainWindow.show();
 

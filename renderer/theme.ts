@@ -39,7 +39,7 @@ const config = defineConfig({
                 bodyBg: {
                     // Valor literal 'white' para base
                     // String de referência '{colors.path.to.token}' para _dark
-                    value: { base: "{color.ghostWhite}", _dark: "#18181bdd" }
+                    value: { base: "{color.ghostWhite}", _dark: "#18181baa" }
                 },
                 preHeaderBg: {
                     value: { base: "black", _dark: "white" }
@@ -79,7 +79,7 @@ const config = defineConfig({
                 },
                 // Cor de fundo para elementos como cards
                 cardBg: {
-                    value: { base: "{colors.gray.50}", _dark: "{colors.gray.700}" }
+                    value: { base: "{colors.gray.50}", _dark: "{colors.gray.900}" }
                 },
                 buttonBg: {
                     value: { base: "{colors.brand.500}", _dark: "{colors.brand.500}" }

@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-br" className={oswald.className} suppressHydrationWarning>
       <body>
         <Providers>
-          <Flex w='100vw' h='100vh' bgImage={'url(background/bg.png)'} bgColor={'gray.900'} bgPos={'center'} bgSize={'cover'} justifyContent='center' alignItems='start' letterSpacing={1.5}
+          <Flex w='100%' h='100%' bgImage={'url(background/bg.png)'} bgColor={'blue.950'} bgPos={'center'} bgSize={'cover'} justifyContent='center' alignItems='start' letterSpacing={1.5}
             color='ghostWhite'
           >
             <SideMenu />

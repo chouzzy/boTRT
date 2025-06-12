@@ -20,6 +20,7 @@ export function SideMenu() {
     return (
         <Flex
             as="nav"
+            draggable
             direction="column" // Organiza os elementos verticalmente
             width={{ base: 'full', md: 'xs' }} // Largura responsiva
             height="100vh" // Ocupa a altura total da tela

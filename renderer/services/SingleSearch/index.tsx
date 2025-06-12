@@ -1,6 +1,6 @@
 
 import * as yup from 'yup';
-import { trtSchema } from '../../app/components/Validation/FormValidator';
+import { trtSchema } from '../../app/components/ui/Validation/FormValidator';
 
 
 interface HandleSubmitSingleSearchProps {
