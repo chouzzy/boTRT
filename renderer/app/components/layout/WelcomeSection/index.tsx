@@ -12,8 +12,8 @@ export function WelcomeSection() {
 
     const { description, subtitle, title, manual, news, callToAction } = homePage
 
-    const MotionButton = motion(Button);
-    const MotionFlex = motion(Flex);
+    const MotionButton = motion.create(Button);
+    const MotionFlex = motion.create(Flex);
 
     const HomeVariants: Variants = {
         initial: { opacity: 0, y: 20 },

@@ -1,5 +1,5 @@
 // app/ipcHandlers.ts
-import { BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 // Importe as funções de SERVIÇO
 import { MainBostExcelService, MainBostService, handleSaveExcel } from '../services/CrawlerService';
 import { importDataProps, ScrapeData } from "../types/generalTypes"; // Seus tipos
@@ -12,7 +12,7 @@ interface InitializeHandlersProps {
 export async function initializeIpcHandlers({ mainWindow }: InitializeHandlersProps) {
 
     ipcMain.on('send-excel-path', async (event, importData: importDataProps) => {
-        
+
         console.log("IPC Handler: Recebido 'send-excel-path'", importData);
         try {
             await MainBostExcelService(mainWindow, importData.excelPath, importData.operationType);
@@ -45,6 +45,15 @@ export async function initializeIpcHandlers({ mainWindow }: InitializeHandlersPr
             return { success: false, error: error.message || "Erro desconhecido ao salvar." };
         }
     });
+
+    ipcMain.on('window-close', (event) => {
+        console.log("IPC Handler: Recebido 'window-close'");
+        app.quit()
+    })
+    ipcMain.on('window-minimize', (event) => {
+        console.log("IPC Handler: Recebido 'window-minimize'");
+        mainWindow.minimize()
+    })
 
     console.log("Todos os handlers IPC foram inicializados.");
 }
