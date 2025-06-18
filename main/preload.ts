@@ -39,8 +39,6 @@ const handler = {
   sendMessage: (message: string) => ipcRenderer.send('send-message', message),
   dateSelected: (date: dateSelected) => ipcRenderer.send('date-selected', date),
   scrapeData: (scrapeData: ScrapeData) => ipcRenderer.send('scrape-data', scrapeData),
-  sendExcelPath: ({ excelPath, operationType }: importDataProps) => ipcRenderer.send('send-excel-path', { excelPath, operationType }),
-
   // Métodos que INVOCAM e esperam uma resposta (Renderer -> Main -> Renderer)
   saveFile: (): Promise<string | null> => ipcRenderer.invoke('dialog:saveFile'), // Retorno do dialog.showSaveDialog
   // Exemplo para o saveExcel se você o refatorar para invoke:
@@ -56,6 +54,10 @@ const handler = {
   processosEncontrados: (callback: (payload: any) => void) => baseOn('processos-encontrados', (data) => callback(data)),
   invalidExcelFormat: (callback: (payload: InvalidExcelFormatPayload) => void) => baseOn('invalid-excel-format', (data) => callback(data as InvalidExcelFormatPayload)),
   progressMessagesDetails: (callback: (payload: ProgressMessagesDetailsPayload) => void) => baseOn('progress-messages', (data) => callback(data as ProgressMessagesDetailsPayload)),
+
+  // No seu handler do preload.js
+  processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string }) =>
+    ipcRenderer.send('process-excel-file', data),
 
   window: {
     minimize: () => ipcRenderer.send('window-minimize'),

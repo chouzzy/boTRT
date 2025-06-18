@@ -159,7 +159,7 @@ const config = defineConfig({
         "html, body": {
             margin: '0',
             padding: '0',
-            bgColor: '{colors.bodyBg}',
+            bgColor: '#00000000',
             zIndex:-2
         },
     },

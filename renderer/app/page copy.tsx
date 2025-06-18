@@ -56,7 +56,7 @@
 //   useEffect(() => {
 //     window.ipc.progressPercentual(async (value) => {
 //       setProgressPercentual(`${value.progress}`)
-//     })
+//     })-vindo ao
 //   }, [])
 
 //   useEffect(() => {

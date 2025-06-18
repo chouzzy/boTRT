@@ -31,13 +31,13 @@ export async function initializeCrawlerService(): Promise<CrawlerResponse> {
 let lastScrapedData: any[][] | null = null; // Use um tipo mais específico se possível
 let lastOperationType: string | null = null;
 
-export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath: string, operationType: string) {
+export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath: Buffer<ArrayBufferLike>, operationType: string) {
     mainWindow.webContents.send('is-loading', true);
     mainWindow.webContents.send('progress-messages', { message: `Lendo planilha: ${excelPath}...` });
 
     try {
         const workbook = new exceljs.Workbook();
-        await workbook.xlsx.readFile(excelPath);
+        await workbook.xlsx.load(excelPath);
         const worksheet = workbook.worksheets[0];
 
         let scrapeDataList: scrapeDataListProps[] = [];
@@ -148,7 +148,7 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
 
         for (const scrapeParams of scrapeDataList) {
             const { trtNumber, date, username, password } = scrapeParams;
-            let currentScrapedData: excelDataIdentified[] | apiResponseArquivadosProps[] | apiResponseAcervoGeralProps[];
+            let currentScrapedData: excelDataIdentified[] | apiResponseArquivadosProps[] | apiResponseAcervoGeralProps[] = [];
             mainWindow.webContents.send('progress-messages', { message: `Buscando TRT: ${scrapeParams.trt}, Usuário: ${username}` });
             switch (operationType) {
                 case "Minha pauta":

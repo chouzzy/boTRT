@@ -1,10 +1,13 @@
-import { createListCollection, Flex, Text } from "@chakra-ui/react";
+import { createListCollection, Flex, Highlight, Text } from "@chakra-ui/react";
 import { select } from "framer-motion/client";
-import { PiDownloadFill, PiLink, PiMagnifyingGlassFill, PiNumberCircleOne, PiNumberCircleOneFill, PiNumberCircleTwoFill, PiShareFat, PiShareFatFill } from "react-icons/pi";
+import { JSX } from "react";
+import { PiArchiveBold, PiBookBold, PiDownloadFill, PiGearBold, PiHouseBold, PiKeyboardBold, PiKeyBold, PiLink, PiMagnifyingGlassBold, PiMagnifyingGlassFill, PiNumberCircleOne, PiNumberCircleOneFill, PiNumberCircleTwoFill, PiPhoneBold, PiShareFat, PiShareFatFill } from "react-icons/pi";
 
 export const homePage = {
     title: <Flex>Bem-vindo ao</Flex>,
-    subtitle: <Flex><Flex w='100%' as='span' color={'ghostWhite'}>Bo</Flex>TRT</Flex>,
+    subtitle:  <Highlight query="TRT" styles={{ color: "#FF5F5E" }}>
+      boTRT
+    </Highlight>,
     description: 'Otimize sua rotina e foque no que realmente importa. O BoTRT automatiza a coleta de dados e o acompanhamento de processos nos portais dos TRTs, entregando todas as informações que você precisa de forma organizada em uma planilha. Deixe o trabalho repetitivo com nosso robô e ganhe mais eficiência para suas análises jurídicas.',
     manual: {
         title: 'Manual do Usuário',
@@ -17,7 +20,7 @@ export const homePage = {
         link: ''
     },
     callToAction: {
-        link: '',
+        link: '/NewSearch',
         buttonText: 'Iniciar'
     }
 }
@@ -36,19 +39,19 @@ export const operations = createListCollection({
       title: 'Minha Pauta',
       description: 'Importa os processos da sua pauta de audiência.',
       icon: <PiNumberCircleOne size={32} color="#FF5F5E" />,
-      value: 'Minha Pauta',
+      value: 'Minha pauta',
     },
     {
       title: 'Processos Arquivados',
       description: 'Importa os processos arquivados do seu painel.',
       icon: <PiNumberCircleTwoFill size={32} color="#FF5F5E" />,
-      value: 'Arquivados',
+      value: 'Processos arquivados',
     },
     {
         title: 'Acervo Geral',
         description: 'Importa os processos do acervo geral do TRT.',
         icon: <PiMagnifyingGlassFill size={32} color="#FF5F5E" />,
-        value: 'Acervo Geral',
+        value: 'Acervo geral',
     }
   ],
 })
@@ -56,21 +59,22 @@ export const operations = createListCollection({
 export interface NavItem {
     label: string;
     href: string;
+    icon: JSX.Element;
 }
 
 // Dados de exemplo para os links
 const mainNavItems: NavItem[] = [
-    { label: 'Página inicial', href: '/' },
-    { label: 'Nova Busca', href: '/NewSearch' },
-    { label: 'Histórico de Buscas', href: '/SearchHistory' },
-    { label: 'Buscas Agendadas', href: '/ScheduleSearch' },
-    { label: 'Configurações', href: '/SettingsPage' },
-    { label: 'Licença e Ativação', href: '/LicensePage' },
+    { label: 'Página inicial', href: '/', icon: <PiHouseBold size={24} /> },
+    { label: 'Nova Busca', href: '/NewSearch', icon: <PiMagnifyingGlassBold size={24} /> },
+    { label: 'Histórico de Buscas', href: '/SearchHistory', icon: <PiBookBold size={24} /> },
+    { label: 'Buscas Agendadas', href: '/ScheduleSearch', icon: <PiArchiveBold size={24} /> },
+    { label: 'Configurações', href: '/SettingsPage', icon: <PiGearBold size={24} /> },
+    { label: 'Licença e Ativação', href: '/LicensePage', icon: <PiKeyBold size={24} /> },
 ];
 
 const supportNavItems: NavItem[] = [
-    { label: 'SUPORTE', href: '/SupportPage' },
-    { label: 'CONTATO', href: '/ContactPage' },
+    { label: 'SUPORTE', href: '/SupportPage',  icon: <PiPhoneBold size={24} />  },
+    { label: 'CONTATO', href: '/ContactPage',  icon: <PiKeyboardBold size={24} />  },
 ];
 
 export const sideBar = {

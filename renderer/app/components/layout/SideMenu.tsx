@@ -2,10 +2,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Flex, Text, Link, VStack, Heading } from '@chakra-ui/react';
+import { Flex, Text, Link, VStack, Heading, Image } from '@chakra-ui/react';
 import NextLink from 'next/link'; // Para navegação Next.js
 import { useColorModeValue } from '../ui/color-mode';
 import { NavItem, sideBar } from 'renderer/data/textData';
+import { TransitionLink } from '../ui/TransitionLink';
 
 
 export function SideMenu() {
@@ -22,27 +23,25 @@ export function SideMenu() {
             as="nav"
             draggable
             direction="column" // Organiza os elementos verticalmente
-            width={{ base: 'full', md: 'xs' }} // Largura responsiva
+            width={{ base: 'full', md: 'sm' }} // Largura responsiva
             height="100vh" // Ocupa a altura total da tela
             bg={'bodyBg'}
-            px={6} // Padding geral
+            px={8} // Padding geral
             py={12} // Padding geral
             top={0}
             left={0}
             zIndex="sticky" // Para ficar sobre o conteúdo
             alignItems={'center'}
             justifyContent={'center'}
+            style={{ borderRadius: '40px 0 0 40px' }}
         >
             {/* Seção do Logo */}
             <Flex mb={10} w='100%' alignItems="center" justifyContent="center">
-                <Heading as="h1" size="3xl" color={logoColor} fontWeight={'bold'} letterSpacing={1.5}>
-                    <Text as="span">Bo</Text>
-                    <Text as="span" color="#FF5F5E">TRT</Text>
-                </Heading>
+                <Image src={'images/logo.svg'} alt='logo' boxSize={24}/>
             </Flex>
 
             {/* Seção Principal de Navegação */}
-            <Flex w='100%' gap={2} align="stretch" flex={1} direction="column" textTransform={'uppercase'}>
+            <Flex w='100%' gap={2} align="stretch" flex={1} direction="column" textTransform={'uppercase'} >
                 {mainNavItems.map((item) => (
                     <NavLink
                         key={item.label}
@@ -92,27 +91,31 @@ function NavLink({ item, isActive, onClick }: NavLinkProps) {
     const hoverColor = useColorModeValue('white', 'white');
 
     return (
-        <NextLink href={item.href} passHref legacyBehavior>
-            <Link
+        <TransitionLink href={item.href}>
+            <Flex
                 onClick={onClick}
+
                 display="flex"
                 alignItems="center"
                 w='100%'
                 py={3}
-                px={8}
+                px={4}
+                bgColor={isActive ? 'whiteAlpha.200' : 'transparent'} // Fundo transparente para manter o efeito hover
                 position="relative" // Para o pseudo-elemento ::before
                 color={isActive ? activeColor : defaultColor}
-                fontWeight={isActive ? 'bold' : 'medium'}
+                fontWeight={isActive ? 'bold' : 'semibold'}
                 transition="color 0.2s ease-in-out"
                 _hover={{
                     color: hoverColor,
                     textDecoration: 'none',
+                    bgColor: 'whiteAlpha.200'
+
                 }}
                 // Pseudo-elemento para a barrinha lateral vermelha do item ativo
                 _before={{
                     content: '""',
                     position: 'absolute',
-                    left: 0,
+                    left: 1,
                     top: '50%',
                     transform: isActive ? 'translateY(-50%) scaleY(1)' : 'translateY(-50%) scaleY(0)',
                     transformOrigin: 'center',
@@ -123,8 +126,12 @@ function NavLink({ item, isActive, onClick }: NavLinkProps) {
                     transition: 'transform 0.3s ease-in-out',
                 }}
             >
-                <Text>{item.label}</Text>
-            </Link>
-        </NextLink>
+                <Flex alignItems={'center'} gap={4} w='100%' justifyContent='start'>
+                    {item.icon}
+                    <Text>{item.label}</Text>
+
+                </Flex>
+            </Flex>
+        </TransitionLink>
     );
 }

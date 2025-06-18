@@ -39,7 +39,7 @@ export interface audistProps {
   tipo: { descricao: string; }
 }
 export interface importDataProps {
-  excelPath: string
+  fileBuffer: Buffer<ArrayBufferLike>
   operationType: string
 }
 

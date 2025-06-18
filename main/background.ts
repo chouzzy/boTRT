@@ -22,14 +22,14 @@ if (isProd) {
     minimizable: true,
     resizable: true,
     closable: true,
-    simpleFullscreen: true,
-    minHeight: 720,
-    minWidth: 1280,
+    height: 980,
+    width: 1920,
     center: true,
     frame: false, // Remove a moldura padrão da janela (incluindo a barra de título)
     titleBarStyle: 'hidden', // No macOS, isso esconde a barra de título mas mantém os botões de "semáforo"
     transparent: true, // Permite que a janela tenha áreas transparentes (bom para bordas arredondadas na UI)
 
+    icon: path.join(__dirname, '../resources/icon.ico'), // Caminho para o ícone
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), // __dirname aponta para a pasta 'app' aqui
       devTools: !isProd, // Abre DevTools apenas em desenvolvimento
@@ -38,7 +38,6 @@ if (isProd) {
     },
   });
 
-  mainWindow.maximize(); // 1. Maximiza a janela principal
   // 3. Mostra a janela, já maximizada, para o usuário
   mainWindow.show();
 

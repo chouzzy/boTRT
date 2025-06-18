@@ -1,0 +1,28 @@
+.draggable-region {
+  -webkit-app-region: drag;
+  color:green
+  /* Esta área inteira pode ser usada para arrastar a janela */
+}
+.non-draggable-region {
+  -webkit-app-region: no-drag;
+  color:green
+  /* Esta área inteira pode ser usada para arrastar a janela */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400..900&display=swap" rel="stylesheet">');
+
+.maven-font {
+  font-family: 'Maven Pro', sans-serif;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}

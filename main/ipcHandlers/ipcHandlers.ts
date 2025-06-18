@@ -11,16 +11,17 @@ interface InitializeHandlersProps {
 
 export async function initializeIpcHandlers({ mainWindow }: InitializeHandlersProps) {
 
-    ipcMain.on('send-excel-path', async (event, importData: importDataProps) => {
+    ipcMain.on('process-excel-file', async (event, payload: importDataProps) => {
 
-        console.log("IPC Handler: Recebido 'send-excel-path'", importData);
+        console.log("IPC Handler: Recebido 'process-excel-file'", payload);
+        const { fileBuffer, operationType } = payload;
         try {
-            await MainBostExcelService(mainWindow, importData.excelPath, importData.operationType);
+            await MainBostExcelService(mainWindow, fileBuffer, operationType);
         } catch (error: any) {
             // Erros já devem ser tratados e logados dentro de MainBostExcelService
             // E 'is-loading' e 'process-finished' também.
             // Aqui, podemos apenas logar que o handler recebeu um erro do serviço.
-            console.error("Handler 'send-excel-path' encontrou um erro vindo do serviço:", error.message);
+            console.error("Handler 'process-excel-file' encontrou um erro vindo do serviço:", error.message);
         }
     });
 
