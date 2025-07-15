@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "my-nextron-app",
-  "description": "My application description",
-  "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "name": "BoTRT",
+  "description": "A powerful and user-friendly web scraping tool designed to simplify data extraction from websites.",
+  "version": "0.0.901",
+  "author": "Matheus Farias <mathfernando@hotmail.com",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",

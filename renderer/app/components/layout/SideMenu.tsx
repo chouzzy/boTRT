@@ -7,11 +7,13 @@ import NextLink from 'next/link'; // Para navegação Next.js
 import { useColorModeValue } from '../ui/color-mode';
 import { NavItem, sideBar } from 'renderer/data/textData';
 import { TransitionLink } from '../ui/TransitionLink';
+import { useLoading } from 'renderer/contexts/LoadingContext';
 
 
 export function SideMenu() {
     const { mainNavItems, supportNavItems } = sideBar
     const [activeItem, setActiveItem] = useState(mainNavItems[0].label); // Estado para controlar o item ativo
+    const { startLoading } = useLoading();
 
     // Cores do tema (assumindo que você tem um fundo escuro)
     const bgColor = useColorModeValue('gray.800', 'gray.900'); // Fundo escuro
@@ -47,7 +49,10 @@ export function SideMenu() {
                         key={item.label}
                         item={item}
                         isActive={activeItem === item.label}
-                        onClick={() => setActiveItem(item.label)}
+                        onClick={() => {
+                            setActiveItem(item.label)
+                            startLoading()
+                        }}
                     />
                 ))}
             </Flex>
@@ -59,7 +64,10 @@ export function SideMenu() {
                         key={item.label}
                         item={item}
                         isActive={activeItem === item.label}
-                        onClick={() => setActiveItem(item.label)}
+                        onClick={() => {
+                            setActiveItem(item.label)
+                            startLoading()
+                        }}
                     />
                 ))}
             </VStack>

@@ -14,7 +14,7 @@ interface TransitionLinkProps extends LinkProps {
 }
 
 export function TransitionLink({ children, href, ...rest }: TransitionLinkProps) {
-  const { startLoading, stopLoading } = useLoading();
+  const { startLoading } = useLoading();
   const currentPath = usePathname();
 
   const handleClick = () => {
@@ -26,7 +26,6 @@ export function TransitionLink({ children, href, ...rest }: TransitionLinkProps)
     // A navegação do Next.js continuará normalmente
   };
   
-  // O stopLoading será chamado pela nova página quando ela carregar
 
   return (
     <NextLink href={href} onClick={handleClick} {...rest}>

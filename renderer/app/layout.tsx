@@ -26,6 +26,7 @@ import { LoadingProvider } from 'renderer/contexts/LoadingContext';
 // Fonts
 import { Comfortaa } from 'next/font/google';
 import { Maven_Pro } from 'next/font/google';
+import { EagerPrefetcher } from './components/utils/EagerPrefetcher';
 
 const maven_pro = Maven_Pro({
   subsets: ['latin'],
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 className='draggable-region'
                 zIndex={0}
               />
+              <EagerPrefetcher />
               <WindowButtons />
               <SideMenu />
               {children}

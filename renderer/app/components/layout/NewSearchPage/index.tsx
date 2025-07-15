@@ -23,15 +23,9 @@ import { toaster } from '../../ui/toaster';
 export function NewSearch() {
     const [logMessages, setLogMessages] = useState<string[]>([]);
     const [isProcessFinished, setIsProcessFinished] = useState(false);
+    const [isProcessStarted, setIsProcessStarted] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    const { stopLoading } = useLoading();
-    const pathname = usePathname();
-
-    useEffect(() => {
-        const timer = setTimeout(() => stopLoading(), 300);
-        return () => clearTimeout(timer);
-    }, [pathname, stopLoading]);
 
     // Efeito para ouvir o fim do processo de scrape
     useEffect(() => {
@@ -39,6 +33,7 @@ export function NewSearch() {
             console.log('Renderer: Recebido "process-finished"', payload);
             if (payload.success) {
                 setIsProcessFinished(true); // Habilita o botão de salvar
+                setIsProcessStarted(false); // Reseta o estado de início do processo
                 toaster.create({
                     title: 'Busca Concluída!',
                     description: payload.message || "Os dados estão prontos para serem salvos.",
@@ -116,6 +111,7 @@ export function NewSearch() {
     const onSubmit = handleSubmit(async (data) => {
         setLogMessages([]);
         setIsProcessFinished(false);
+        setIsProcessStarted(true); // Marca que o processo foi iniciado
         const { operacao, planilha } = data;
         console.log("Dados submetidos:", data);
 
@@ -180,6 +176,7 @@ export function NewSearch() {
             });
         } finally {
             setIsSaving(false);
+            setIsProcessStarted(false); // Reseta o estado de início do processo
         }
     };
 
@@ -250,7 +247,7 @@ export function NewSearch() {
                         </Fieldset.Root>
                     </form>
                     <Flex borderLeft={'1px solid'} borderColor={'whiteAlpha.300'} h='auto' />
-                    <DescriptionPanel description={newSearch.description} logMessages={logMessages} />
+                    <DescriptionPanel description={newSearch.description} logMessages={logMessages} isProcessFinished={isProcessFinished} isProcessStarted={isProcessStarted}/>
                 </Flex>
             </MotionFlex>
         </Flex>

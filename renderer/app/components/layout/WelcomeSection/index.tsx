@@ -106,7 +106,7 @@ export function WelcomeSection() {
                     </Flex>
 
                     <Flex>
-                        <NextLink href={callToAction.link} style={{ textDecoration: 'none' }} target='_self'>
+                        <Link href={callToAction.link} style={{ textDecoration: 'none' }}>
                         <MotionButton
                             variants={ctaVariants}
                             initial='initial'
@@ -124,7 +124,7 @@ export function WelcomeSection() {
                         >
                             {callToAction.buttonText}
                         </MotionButton>
-                        </NextLink>
+                        </Link>
                     </Flex>
                 </Flex>
 
