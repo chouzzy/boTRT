@@ -11,6 +11,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.3.0",
     "@chakra-ui/react": "^3.19.2",
     "@emotion/react": "^11.14.0",
     "@types/axios": "^0.14.4",
