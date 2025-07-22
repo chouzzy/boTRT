@@ -1,92 +1,116 @@
-// app/background.js (ou .ts se você converter)
+// main/background.ts
+
 import path from 'path';
-import { app, BrowserWindow, dialog } from 'electron'; // Removido ipcMain e dialog daqui por enquanto
+// A MUDANÇA: Importamos o 'shell' para abrir links externos
+import { app, BrowserWindow, shell } from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
-import { initializeCrawlerService } from './services/CrawlerService';
 import { initializeIpcHandlers } from './ipcHandlers/ipcHandlers';
 
 const isProd = process.env.NODE_ENV === 'production';
 
+// --- Configuração do Protocolo Customizado (Auth0) ---
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('botrt', process.execPath, [path.resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('botrt');
+}
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+}
+
+// --- Servidor de Arquivos Estáticos para Produção ---
 if (isProd) {
-  serve({ directory: 'app' }); // Ajuste 'app' para 'renderer/out' se for a saída do build do Next.js
+  serve({ directory: 'app' });
 } else {
   app.setPath('userData', `${app.getPath('userData')} (development)`);
 }
 
+let mainWindow: BrowserWindow | null;
+
 (async () => {
   await app.whenReady();
 
-  const mainWindow = createWindow('main', { // Assume que createWindow retorna a BrowserWindow
-    // icon: './app/images/logos/boTRT-icon.ico', // Ajustei o caminho para assets/
+  mainWindow = createWindow('main', {
     minimizable: true,
     resizable: true,
     closable: true,
     height: 980,
     width: 1920,
     center: true,
-    frame: false, // Remove a moldura padrão da janela (incluindo a barra de título)
-    titleBarStyle: 'hidden', // No macOS, isso esconde a barra de título mas mantém os botões de "semáforo"
-    transparent: true, // Permite que a janela tenha áreas transparentes (bom para bordas arredondadas na UI)
-
-    icon: path.join(__dirname, '../resources/icon.ico'), // Caminho para o ícone
+    frame: false,
+    titleBarStyle: 'hidden',
+    transparent: true,
+    icon: path.join(__dirname, '../resources/icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // __dirname aponta para a pasta 'app' aqui
-      devTools: !isProd, // Abre DevTools apenas em desenvolvimento
+      preload: path.join(__dirname, 'preload.js'),
+      devTools: !isProd,
       nodeIntegration: false,
       contextIsolation: true,
     },
   });
 
-  // 3. Mostra a janela, já maximizada, para o usuário
+  // ============================================================================
+  //   A MÁGICA: Intercepta a Navegação para o Login
+  // ============================================================================
+  // Este listener observa todas as tentativas de navegação dentro do app.
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    // Verifica se a URL de destino é a página de login do Auth0.
+    const auth0Domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN || 'dev-pzivs8swerlhnydf.us.auth0.com';
+    if (url.includes(auth0Domain)) {
+      // 1. Previne que a página abra DENTRO do app Electron.
+      event.preventDefault();
+      // 2. Usa o 'shell' do Electron para abrir a URL no navegador PADRÃO do usuário.
+      shell.openExternal(url);
+    }
+  });
+
   mainWindow.show();
 
-
-  // Carrega a URL do frontend Next.js
   if (isProd) {
-
     await mainWindow.loadURL('app://./');
-    console.log('__dirname do background.js:', __dirname);
-    console.log('Caminho completo do preload:', path.join(__dirname, 'preload.js'));
-
   } else {
-
-    console.log('__dirname do background.js:', __dirname);
-    console.log('Caminho completo do preload:', path.join(__dirname, 'preload.js'));
-    const port = process.argv[2]; // Nextron passa a porta como argumento
+    const port = process.argv[2];
     await mainWindow.loadURL(`http://localhost:${port}/`);
-    // mainWindow.webContents.openDevTools()
-
   }
 
-  // Inicializa todos os seus listeners e handlers IPC
-  // Passamos a mainWindow para que os handlers possam enviar mensagens de volta para ela
   await initializeIpcHandlers({ mainWindow });
   console.log("Handlers IPC inicializados.");
 
 })();
 
+// --- Handlers de Eventos do App (sem alterações) ---
+app.on('second-instance', (event, commandLine) => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+    const url = commandLine.pop()?.slice(0, -1);
+    if (url) {
+      mainWindow.webContents.send('auth0-callback', url);
+    }
+  }
+});
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  if (mainWindow) {
+    mainWindow.webContents.send('auth0-callback', url);
+    mainWindow.show();
+  }
+});
+
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') { // Comportamento padrão macOS
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('activate', () => {
-  // No macOS, é comum recriar uma janela no aplicativo quando o
-  // ícone do dock é clicado e não há outras janelas abertas.
   if (BrowserWindow.getAllWindows().length === 0) {
-    // Chame sua função para criar a janela principal novamente
-    // const newMainWindow = createWindow('main', {...});
-    // initializeIpcHandlers(newMainWindow); // E reinicialize os handlers para a nova janela
-    // (Seu createWindow precisaria estar acessível aqui, ou recrie a lógica)
-    // Por ora, vamos focar no fluxo principal.
+    // Recrie a janela aqui se necessário
   }
 });
-
-// Mantenha apenas handlers IPC MUITO genéricos ou de baixo nível aqui, se houver.
-// O ideal é que todos os handlers específicos da aplicação fiquem em ipcHandlers.ts
-// Exemplo:
-// ipcMain.on('get-app-version', (event) => {
-//   event.returnValue = app.getVersion();
-// });

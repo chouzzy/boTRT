@@ -12,11 +12,8 @@ export function LoadingScreen() {
         <AnimatePresence>
             {isLoading && (
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
                     style={{
+                        borderRadius: '40px',
                         position: 'fixed',
                         top: 0,
                         left: 0,
@@ -29,6 +26,7 @@ export function LoadingScreen() {
                     }}
                 >
                     <Flex
+                        borderRadius={40}
                         align="center"
                         justify="center"
                         width="full"

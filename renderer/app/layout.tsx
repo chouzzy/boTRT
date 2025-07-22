@@ -27,6 +27,7 @@ import { LoadingProvider } from 'renderer/contexts/LoadingContext';
 import { Comfortaa } from 'next/font/google';
 import { Maven_Pro } from 'next/font/google';
 import { EagerPrefetcher } from './components/utils/EagerPrefetcher';
+import { Auth0ProviderForDesktop } from './components/providers/Auth0ProviderForDesktop';
 
 const maven_pro = Maven_Pro({
   subsets: ['latin'],
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-br" className={maven_pro.className} suppressHydrationWarning>
       <body style={{ borderRadius: '40px' }}>
         <Providers>
+          <Auth0ProviderForDesktop>
           <LoadingProvider>
             <LoadingScreen />
             <Flex
@@ -83,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </Flex>
           </LoadingProvider>
+          </Auth0ProviderForDesktop>
         </Providers>
       </body>
     </html>
