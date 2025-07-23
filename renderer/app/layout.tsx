@@ -28,6 +28,7 @@ import { Comfortaa } from 'next/font/google';
 import { Maven_Pro } from 'next/font/google';
 import { EagerPrefetcher } from './components/utils/EagerPrefetcher';
 import { Auth0ProviderForDesktop } from './components/providers/Auth0ProviderForDesktop';
+import { AuthenticationGuard } from './components/auth/AuthenticationGuard';
 
 const maven_pro = Maven_Pro({
   subsets: ['latin'],
@@ -56,35 +57,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ borderRadius: '40px' }}>
         <Providers>
           <Auth0ProviderForDesktop>
-          <LoadingProvider>
-            <LoadingScreen />
-            <Flex
-              w='100%'
-              h='100%'
-              bgImage={'url(background/bg.png)'}
-              bgColor={'blue.950'}
-              bgPos={'center'}
-              bgSize={'cover'}
-              justifyContent='center'
-              alignItems='start'
-              color='ghostWhite'
-              pos={'relative'}
-              borderRadius={40}
-            >
-              <Flex
-                w='100%'
-                h={28}
-                pos={'absolute'}
-                top={0}
-                className='draggable-region'
-                zIndex={0}
-              />
-              <EagerPrefetcher />
+            <LoadingProvider>
+              <LoadingScreen />
+              <AuthenticationGuard>
+                <Flex
+                  w='100%'
+                  h='100%'
+                  bgImage={'url(background/bg.png)'}
+                  bgColor={'blue.950'}
+                  bgPos={'center'}
+                  bgSize={'cover'}
+                  justifyContent='center'
+                  alignItems='start'
+                  color='ghostWhite'
+                  pos={'relative'}
+                  borderRadius={40}
+                >
+                  <Flex
+                    w='100%'
+                    h={28}
+                    pos={'absolute'}
+                    top={0}
+                    className='draggable-region'
+                    zIndex={0}
+                  />
+                  <EagerPrefetcher />
+                  <SideMenu />
+                  {children}
+                </Flex>
+              </AuthenticationGuard>
               <WindowButtons />
-              <SideMenu />
-              {children}
-            </Flex>
-          </LoadingProvider>
+            </LoadingProvider>
           </Auth0ProviderForDesktop>
         </Providers>
       </body>
