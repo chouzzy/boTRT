@@ -181,14 +181,14 @@ export function NewSearch() {
     };
 
     return (
-        <Flex flexDir={'column'}  w='100%' h='100vh' bg={'transparent'} justifyContent={'center'} alignItems='center'>
-            <MotionFlex variants={HomeVariants} initial='initial' bgColor={'cardBg'} animate='visible' flexDir={'column'} w='breakpoint-xl' gap={12} p={16} borderRadius={40}>
-                <Flex gap={8}>
+        <Flex flexDir={'column'} w='100%' h='100vh' bg={'transparent'} justifyContent={'center'} alignItems='center'>
+            <MotionFlex variants={HomeVariants} initial='initial' bgColor={'cardBg'} animate='visible' flexDir={'column'} w='breakpoint-md' gap={2} p={4} borderRadius={40}>
+                <Flex gap={4}>
                     <form onSubmit={onSubmit}>
                         <Fieldset.Root size="lg">
-                            <SearchTitle title={title} />
+                            {/* <SearchTitle title={title} /> */}
                             <Fieldset.Content>
-                                <VStack gap={6}>
+                                <VStack gap={2}>
                                     <OperationSelect
                                         control={control}
                                         errors={errors}
@@ -210,13 +210,13 @@ export function NewSearch() {
                                 border='1px solid #FFFFFF55'
                                 color={'ghostWhite'}
                                 w="full"
-                                mt={8}
-                                py={8}
-                                fontSize={'2xl'}
+                                mt={2}
+                                py={6}
+                                fontSize={'lg'}
                                 gap={4}
                                 _hover={{ bgColor: 'ghostWhite', color: 'brand.500', transition: ' 0.6s ease-in-out' }}
                             >
-                                <PiPlayFill size={24} />
+                                <PiPlayFill size={20} />
                                 INICIAR
                             </Button>
 
@@ -234,12 +234,11 @@ export function NewSearch() {
                                         color={'brand.500'}
                                         _hover={{ bgColor: 'brand.500', color: 'ghostWhite', transition: '0.6s ease-in-out' }}
                                         w="full"
-                                        mt={4} // Espaçamento
-                                        py={8}
-                                        fontSize={'xl'}
+                                        py={6}
+                                        fontSize={'lg'}
                                         gap={4}
                                     >
-                                        <PiFloppyDiskFill size={24} />
+                                        <PiFloppyDiskFill size={20} />
                                         SALVAR RELATÓRIO
                                     </Button>
                                 </motion.div>
@@ -247,7 +246,7 @@ export function NewSearch() {
                         </Fieldset.Root>
                     </form>
                     <Flex borderLeft={'1px solid'} borderColor={'whiteAlpha.300'} h='auto' />
-                    <DescriptionPanel description={newSearch.description} logMessages={logMessages} isProcessFinished={isProcessFinished} isProcessStarted={isProcessStarted}/>
+                    <DescriptionPanel description={newSearch.description} logMessages={logMessages} isProcessFinished={isProcessFinished} isProcessStarted={isProcessStarted} />
                 </Flex>
             </MotionFlex>
         </Flex>

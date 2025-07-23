@@ -32,7 +32,7 @@ export function OperationSelect({ control, errors, selectLabel }: OperationSelec
                             <CustomText text={selectLabel} fontWeight={'light'} fontSize={'sm'} textTransform={'uppercase'} pl={1} w='100%' />
                         </Select.Label>
                         <Select.Control>
-                            <Select.Trigger>
+                            <Select.Trigger cursor={'pointer'} _hover={{border: '1px solid ghostWhite', transition: '0.6s ease-in-out'}}>
                                 <Select.ValueText
                                     placeholder="Selecione"
                                     fontWeight={'medium'}
@@ -48,7 +48,7 @@ export function OperationSelect({ control, errors, selectLabel }: OperationSelec
                             <Select.Positioner>
                                 <Select.Content>
                                     {operations.items.map((framework) => (
-                                        <Select.Item item={framework} key={framework.value}>
+                                        <Select.Item item={framework} key={framework.value} cursor={'pointer'}>
                                             <CustomText text={framework.title} fontWeight={'medium'} fontSize={'sm'} textTransform={'uppercase'} pl={1} w='100%' letterSpacing={1.3} />
                                             <Select.ItemIndicator />
                                         </Select.Item>

@@ -26,6 +26,7 @@ export function SideMenu() {
             draggable
             direction="column" // Organiza os elementos verticalmente
             width={{ base: 'full', md: 'sm' }} // Largura responsiva
+            minW={320}
             height="100vh" // Ocupa a altura total da tela
             bg={'bodyBg'}
             px={8} // Padding geral

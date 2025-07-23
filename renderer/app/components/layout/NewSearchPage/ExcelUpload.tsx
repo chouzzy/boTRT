@@ -25,7 +25,7 @@ export function ExcelUpload({ register, inputLabel, inputDescription, downloadBu
     };
     
     return (
-        <FileUpload.Root maxW="sm" alignItems="stretch" maxFiles={1} gap={8}>
+        <FileUpload.Root maxW="sm" maxFiles={1} gap={6} >
             <Fieldset.Legend>
                 <CustomText text={inputLabel} fontWeight={'light'} fontSize={'sm'} textTransform={'uppercase'} pl={1} w='100%' />
             </Fieldset.Legend>
@@ -34,7 +34,7 @@ export function ExcelUpload({ register, inputLabel, inputDescription, downloadBu
                     <Link href={downloadLink} style={{ textDecoration: 'none', color: 'inherit' }} target='_blank'>
                         <Flex gap={2} alignItems={'center'}>
                             <PiDownloadSimpleFill />
-                            <CustomText text={downloadButtonLabel} />
+                            <CustomText fontSize={'xs'} text={downloadButtonLabel} />
                         </Flex>
                     </Link>
                 </MotionButton>
@@ -42,7 +42,7 @@ export function ExcelUpload({ register, inputLabel, inputDescription, downloadBu
             <FileUpload.HiddenInput {...register("planilha")} />
             <FileUpload.Dropzone>
                 <Flex gap={4}>
-                    <Flex color="#217346" bgColor={'ghostWhite'} borderRadius={'lg'} p={1}>
+                    <Flex color="#323333ff" bgColor={'ghostWhite'} borderRadius={'lg'} p={1}>
                         <PiMicrosoftExcelLogoFill size={42} />
                     </Flex>
                 </Flex>

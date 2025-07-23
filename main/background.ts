@@ -22,8 +22,8 @@ if (isProd) {
     minimizable: true,
     resizable: true,
     closable: true,
-    height: 980,
-    width: 1920,
+    height: 700,
+    width: 1320,
     center: true,
     frame: false, // Remove a moldura padrão da janela (incluindo a barra de título)
     titleBarStyle: 'hidden', // No macOS, isso esconde a barra de título mas mantém os botões de "semáforo"

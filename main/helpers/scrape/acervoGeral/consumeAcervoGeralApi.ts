@@ -169,7 +169,7 @@ export async function ConsumeAcervoGeralApi(
 
             await page.waitForSelector("#mat-select-value-1 > span", { visible: true })
 
-            const url = await scrapeURL(painel, trt, 1000, grau, undefined, urlInterceptedID)
+            const url = await scrapeURL(painel, trt, 99999, grau, undefined, urlInterceptedID)
             await page.goto(url);
 
             try {

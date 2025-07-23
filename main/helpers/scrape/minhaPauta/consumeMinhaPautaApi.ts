@@ -147,7 +147,7 @@ export async function consumeMinhaPautaApi(
         // Código de navegação e scrape
         try {
 
-            const url = await scrapeURL(painel, trt, 1000, grau, dateSelected)
+            const url = await scrapeURL(painel, trt, 99999, grau, dateSelected)
 
 
             await page.goto(url);

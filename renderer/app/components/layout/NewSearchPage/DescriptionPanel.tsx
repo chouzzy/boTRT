@@ -77,7 +77,7 @@ export function LogDisplay({ logs }: LogDisplayProps) {
             gap={4}
             h='100%'
             w='100%'
-            maxW={720}
+            maxW={360}
             justifyContent={'center'}
             alignItems={'center'}
         >

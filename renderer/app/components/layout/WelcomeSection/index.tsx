@@ -57,8 +57,7 @@ export function WelcomeSection() {
             w='100%'
             h='100vh'
             bg={'transparent'}
-            px={20}
-            py={32}
+            p={12}
             justifyContent={'center'}
             alignItems={'start'}
         >
@@ -67,8 +66,8 @@ export function WelcomeSection() {
                 initial='initial'
                 animate='visible'
                 flexDir={'column'}
-                w='breakpoint-lg'
-                gap={20}
+                w='breakpoint-md'
+                gap={8}
             >
                 <Flex flexDir={'column'} gap={8}>
                     <Flex flexDir={'column'} lineHeight={1} gap={8}>
