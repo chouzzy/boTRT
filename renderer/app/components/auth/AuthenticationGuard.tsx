@@ -1,8 +1,7 @@
 // src/components/auth/AuthenticationGuard.tsx
 'use client';
 
-import { useAuth0 } from '@auth0/auth0-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { Flex, Spinner, Heading, Text, Button, VStack, Icon } from '@chakra-ui/react';
 import { PiSignIn, PiWarningCircleFill } from 'react-icons/pi';
 
@@ -10,18 +9,20 @@ import { PiSignIn, PiWarningCircleFill } from 'react-icons/pi';
 //   SUB-COMPONENTE: Tela de Login
 // ============================================================================
 function LoginScreen() {
-    const { loginWithRedirect } = useAuth0();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleLogin = () => {
+        setIsLoading(true);
+        // Apenas envia o sinal para o processo main iniciar todo o fluxo.
+        window.ipc.startLogin();
+    };
+
     return (
         <Flex w="100vw" h="100vh" justify="center" align="center" bg="gray.800" color="white">
             <VStack gap={8}>
                 <Heading>Bem-vindo ao BoTRT</Heading>
                 <Text>Por favor, faça o login para continuar.</Text>
-                <Button
-                    colorScheme="blue"
-                    size="lg"
-                    onClick={() => loginWithRedirect()}
-                >
-                    {/* Ícone e texto como filhos para o padrão Chakra UI v3 */}
+                <Button colorScheme="blue" size="lg" onClick={handleLogin} loading={isLoading}>
                     <Flex align="center" justify="center" gap={2}>
                         <Icon as={PiSignIn} />
                         <Text>Entrar com sua Conta</Text>
@@ -43,14 +44,12 @@ function InvalidLicenseScreen() {
                 <Heading size="lg">Assinatura Não Encontrada</Heading>
                 <Text textAlign="center" maxW="md">
                     Não encontramos uma assinatura ativa para sua conta.
-                    Por favor, visite nosso site para adquirir um plano ou entre em contato com o suporte se acredita que isso é um erro.
+                    Por favor, visite nosso site para adquirir um plano ou entre em contato com o suporte.
                 </Text>
                 <Button
                     colorScheme="blue"
                     onClick={() => {
-                        // TODO: Implementar IPC para abrir o link no navegador
-                        // Ex: window.ipc.send('open-external-link', 'https://www.awer.co/tecnologia/botrt');
-                        console.log("Abrindo site de planos...");
+                        window.ipc.openExternal('https://www.awer.co/tecnologia/botrt');
                     }}
                 >
                     Ver Planos
@@ -64,97 +63,81 @@ function InvalidLicenseScreen() {
 //   COMPONENTE PRINCIPAL: AuthenticationGuard
 // ============================================================================
 export function AuthenticationGuard({ children }: { children: React.ReactNode }) {
-    const {
-        isAuthenticated,
-        isLoading: isAuthLoading,
-        getAccessTokenSilently,
-        handleRedirectCallback, // Importado para finalizar o login
-    } = useAuth0();
-
+    // ESTADOS LOCAIS: Agora nós controlamos o estado, não mais o useAuth0.
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [isLicenseValid, setIsLicenseValid] = useState(false);
     const [isLicenseCheckLoading, setIsLicenseCheckLoading] = useState(true);
 
-    // Efeito para ouvir o callback do Auth0 vindo do processo Main
+    // Efeito que verifica o estado de autenticação UMA VEZ ao carregar o app
     useEffect(() => {
-        const handleAuthCallback = async (url: string) => {
-            console.log('[DEBUG] Callback do Auth0 recebido no renderer:', url); // LOG 1
-            if (url.includes("code=") && url.includes("state=")) {
-                try {
-                    console.log('[DEBUG] Processando handleRedirectCallback...'); // LOG 2
-                    await handleRedirectCallback(url);
-                    console.log('[DEBUG] handleRedirectCallback processado com SUCESSO.'); // LOG 3
-                } catch (error) {
-                    console.error("[DEBUG] ERRO DENTRO DO handleRedirectCallback:", error); // LOG DE ERRO
-                }
-            }
+        const checkAuthStatus = async () => {
+            console.log("[GUARD] Verificando status de autenticação inicial...");
+            // Pergunta ao processo main se já existe uma sessão válida
+            const authenticated = await window.ipc.isAuthenticated();
+            console.log("[GUARD] Resposta do main:", authenticated);
+            setIsAuthenticated(authenticated);
+            setIsAuthLoading(false);
         };
+        checkAuthStatus();
+    }, []);
 
-        // Registra o ouvinte usando a API 'ipc' que expusemos no preload.js
-        const cleanup = window.ipc.onAuth0Callback(handleAuthCallback);
-
-        return cleanup;
-    }, [handleRedirectCallback]);
-
-
-    // Efeito que verifica a licença
+    // Efeito que verifica a licença APENAS se estiver autenticado
     useEffect(() => {
         const checkLicense = async () => {
-            // LOG 4: Verifica o estado de autenticação ANTES de buscar a licença
-            console.log('[DEBUG] Verificando licença. Estado isAuthenticated:', isAuthenticated);
-
             if (isAuthenticated) {
+                console.log("[GUARD] Usuário autenticado. Verificando licença...");
                 try {
-                    const token = await getAccessTokenSilently();
-                    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                    // Pede o token de acesso para o processo main
+                    const token = await window.ipc.getAccessToken();
+                    if (!token) {
+                        throw new Error("Token de acesso não disponível.");
+                    }
 
+                    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
                     const response = await fetch(`${apiBaseUrl}/api/subscription/details`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                        headers: { Authorization: `Bearer ${token}` },
                     });
 
                     if (response.ok) {
                         const data = await response.json();
                         if (data.status === 'active') {
-                            console.log('[DEBUG] Licença VÁLIDA encontrada!'); // LOG 5
+                            console.log("[GUARD] Licença VÁLIDA encontrada!");
                             setIsLicenseValid(true);
                         } else {
-                             console.log('[DEBUG] Licença encontrada, mas não está ativa.'); // LOG 6
+                            console.log("[GUARD] Licença encontrada, mas com status:", data.status);
                         }
+                    } else {
+                        console.log("[GUARD] Resposta de verificação de licença não foi OK.");
+                        setIsLicenseValid(false);
                     }
                 } catch (error) {
-                    console.error("[DEBUG] Erro ao verificar a licença:", error);
+                    console.error("[GUARD] Erro ao verificar a licença:", error);
                     setIsLicenseValid(false);
                 } finally {
                     setIsLicenseCheckLoading(false);
                 }
             } else {
+                // Se não está autenticado, não há licença para verificar
                 setIsLicenseCheckLoading(false);
             }
         };
-
+        
+        // Só roda a verificação de licença depois que a verificação de auth terminar
         if (!isAuthLoading) {
             checkLicense();
         }
-    }, [isAuthenticated, isAuthLoading, getAccessTokenSilently]);
+    }, [isAuthenticated, isAuthLoading]);
 
     // --- Renderização Condicional ---
-
     if (isAuthLoading || isLicenseCheckLoading) {
-        return (
-            <Flex w="100vw" h="100vh" justify="center" align="center" bg="gray.800">
-                <Spinner size="xl" color="blue.500" />
-            </Flex>
-        );
+        return <Flex w="100vw" h="100vh" justify="center" align="center" bg="gray.800"><Spinner size="xl" color="blue.500" /></Flex>;
     }
-
     if (isAuthenticated && isLicenseValid) {
         return <>{children}</>;
     }
-
     if (isAuthenticated && !isLicenseValid) {
         return <InvalidLicenseScreen />;
     }
-
     return <LoginScreen />;
 }
