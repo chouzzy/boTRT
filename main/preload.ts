@@ -57,8 +57,27 @@ const handler = {
     invalidExcelFormat: (callback: (payload: InvalidExcelFormatPayload) => void) => baseOn('invalid-excel-format', (data) => callback(data as InvalidExcelFormatPayload)),
     progressMessagesDetails: (callback: (payload: ProgressMessagesDetailsPayload) => void) => baseOn('progress-messages', (data) => callback(data as ProgressMessagesDetailsPayload)),
 
+    // --- AS NOVAS FUNÇÕES DA PONTE ---
+    // 1. Pede ao processo main para INICIAR todo o fluxo de login.
+    startLogin: (): void => ipcRenderer.send('auth:start-login'),
+
+    // 2. Ouve o evento de SUCESSO vindo do processo main.
+    onLoginSuccess: (callback: () => void) => baseOn('auth:login-success', callback),
+
     // A MUDANÇA: Novo método para ouvir o callback do Auth0
     onAuth0Callback: (callback: (url: string) => void) => baseOn('auth0-callback', (url) => callback(url as string)),
+
+    // --- GERENCIAMENTO DE SESSÃO ---
+    // Renderer -> Main: Pergunta se o usuário está autenticado (ao iniciar o app).
+    isAuthenticated: (): Promise<boolean> => ipcRenderer.invoke('auth:is-authenticated'),
+
+    // Renderer -> Main: Pede o token de acesso para fazer chamadas de API.
+    getAccessToken: (): Promise<string | null> => ipcRenderer.invoke('auth:get-access-token'),
+
+    // Renderer -> Main: Pede para fazer logout.
+    logout: (): void => ipcRenderer.send('auth:logout'),
+
+    openExternal: (url: string) => ipcRenderer.send('open-external-link', url),
 
     // No seu handler do preload.js
     processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string }) =>
