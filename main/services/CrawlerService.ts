@@ -306,7 +306,7 @@ function addDataToWorksheet(worksheet: exceljs.Worksheet, data: excelDataIdentif
                 numeroProcesso: item.numeroProcesso,
                 tipoAudiencia: item.tipoAudiencia,
                 orgaoJulgador: item.orgaoJulgador,
-                excelDataInicio: moment(item.dataInicio).format('DD/MM/YYYY'),
+                dataInicio: moment(item.dataInicio).format('DD/MM/YYYY'),
                 horaInicio: moment(item.dataInicio).format('HH:mm'),
                 poloAtivo: item.poloAtivo,
                 poloPassivo: item.poloPassivo,

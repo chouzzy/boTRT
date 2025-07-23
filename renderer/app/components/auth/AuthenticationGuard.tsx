@@ -1,28 +1,26 @@
 // src/components/auth/AuthenticationGuard.tsx
 'use client';
 
-import { useState, useEffect, createContext, useContext } from 'react';
-import { Flex, Spinner, Heading, Text, Button, VStack, Icon } from '@chakra-ui/react';
-import { PiSignIn, PiWarningCircleFill } from 'react-icons/pi';
+import { useState, useEffect, useCallback } from 'react';
+import { Flex, Spinner, Heading, Text, Button, VStack, Icon, HStack, Image } from '@chakra-ui/react';
+import { PiSignIn, PiWarningCircleFill, PiArrowClockwise, PiSmileyXEyesLight } from 'react-icons/pi';
 
 // ============================================================================
 //   SUB-COMPONENTE: Tela de Login
 // ============================================================================
 function LoginScreen() {
     const [isLoading, setIsLoading] = useState(false);
-
     const handleLogin = () => {
         setIsLoading(true);
-        // Apenas envia o sinal para o processo main iniciar todo o fluxo.
         window.ipc.startLogin();
     };
-
     return (
-        <Flex w="100vw" h="100vh" justify="center" align="center" bg="gray.800" color="white">
+        <Flex w="100vw" h="100vh" justify="center" align="center" bg="blue.950" color="white" borderRadius={40}>
             <VStack gap={8}>
-                <Heading>Bem-vindo ao BoTRT</Heading>
+                <Image src="/images/logo.svg" alt="Logo" boxSize="100px" mx='auto' />
+                <Heading>Bem-vindo ao Bo<span style={{ color: '#FF5F5E' }}>TRT</span></Heading>
                 <Text>Por favor, faça o login para continuar.</Text>
-                <Button colorScheme="blue" size="lg" onClick={handleLogin} loading={isLoading}>
+                <Button colorScheme="blue" size="lg" onClick={handleLogin} loading={isLoading} bgColor={'brand.600'} color={'white'} _hover={{ bgColor: 'brand.700' }} width="100%">
                     <Flex align="center" justify="center" gap={2}>
                         <Icon as={PiSignIn} />
                         <Text>Entrar com sua Conta</Text>
@@ -34,26 +32,79 @@ function LoginScreen() {
 }
 
 // ============================================================================
-//   SUB-COMPONENTE: Tela de Licença Inválida
+//   SUB-COMPONENTE: Tela de Licença Inválida (COM POLLING E CONTADOR)
 // ============================================================================
-function InvalidLicenseScreen() {
+interface InvalidLicenseScreenProps {
+    onRecheckLicense: () => void;
+    isRechecking: boolean;
+}
+
+function InvalidLicenseScreen({ onRecheckLicense, isRechecking }: InvalidLicenseScreenProps) {
+    
+    // A MUDANÇA: Estado para o contador regressivo
+    const [countdown, setCountdown] = useState(10);
+
+    // Efeito para verificação automática (Polling)
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            if (!isRechecking) {
+                console.log("[POLLING] Verificando licença automaticamente...");
+                onRecheckLicense();
+            }
+        }, 10000); // 10 segundos
+        return () => clearInterval(intervalId);
+    }, [onRecheckLicense, isRechecking]);
+
+    // A MUDANÇA: Efeito para o contador visual
+    useEffect(() => {
+        // Zera o contador quando uma verificação começa
+        if (isRechecking) {
+            setCountdown(10);
+        }
+        
+        const countdownInterval = setInterval(() => {
+            setCountdown(prev => (prev > 1 ? prev - 1 : 10));
+        }, 1000); // 1 segundo
+
+        return () => clearInterval(countdownInterval);
+    }, [isRechecking]);
+
     return (
-        <Flex w="100vw" h="100vh" justify="center" align="center" bg="gray.800" color="white" p={4}>
-            <VStack gap={8} p={10} bg="gray.700" borderRadius="lg" boxShadow="lg">
-                <Icon as={PiWarningCircleFill} boxSize={16} color="yellow.400" />
+        <Flex w="100vw" h="100vh" justify="center" align="center" bg="blue.950" color="white" p={4} borderRadius={40}>
+            <VStack gap={6} p={10} bg="gray.700" borderRadius="lg" boxShadow="lg" position="relative">
+                <Icon as={PiSmileyXEyesLight} boxSize={16} color="brand.500" />
                 <Heading size="lg">Assinatura Não Encontrada</Heading>
                 <Text textAlign="center" maxW="md">
-                    Não encontramos uma assinatura ativa para sua conta.
-                    Por favor, visite nosso site para adquirir um plano ou entre em contato com o suporte.
+                    Se você acabou de assinar, aguarde um momento enquanto validamos seu plano. O aplicativo verificará novamente em alguns segundos.
                 </Text>
-                <Button
-                    colorScheme="blue"
-                    onClick={() => {
-                        window.ipc.openExternal('https://www.awer.co/tecnologia/botrt');
-                    }}
+                <HStack gap={4} w="100%" justify="center" pt={4}>
+                    <Button
+                        variant="outline"
+                        bgColor={'brand.500'}
+                        _hover={{ bgColor: 'brand.600' }}
+                        onClick={() => {
+                            window.ipc.openExternal('https://www.awer.co/tecnologia/botrt');
+                        }}
+                    >
+                        Ver Planos
+                    </Button>
+                </HStack>
+                
+                {/* A MUDANÇA: Contador no canto da tela */}
+                <Flex
+                    position="absolute"
+                    bottom={4}
+                    right={4}
+                    align="center"
+                    gap={2}
+                    color="gray.400"
+                    fontSize="xs"
                 >
-                    Ver Planos
-                </Button>
+                    <Spinner size="xs" opacity={isRechecking ? 1 : 0} />
+                    <Text>
+                        {isRechecking ? 'Verificando...' : `Próxima verificação em ${countdown}s`}
+                    </Text>
+                </Flex>
             </VStack>
         </Flex>
     );
@@ -63,81 +114,79 @@ function InvalidLicenseScreen() {
 //   COMPONENTE PRINCIPAL: AuthenticationGuard
 // ============================================================================
 export function AuthenticationGuard({ children }: { children: React.ReactNode }) {
-    // ESTADOS LOCAIS: Agora nós controlamos o estado, não mais o useAuth0.
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [isLicenseValid, setIsLicenseValid] = useState(false);
     const [isLicenseCheckLoading, setIsLicenseCheckLoading] = useState(true);
+    const [isRechecking, setIsRechecking] = useState(false);
 
     // Efeito que verifica o estado de autenticação UMA VEZ ao carregar o app
     useEffect(() => {
         const checkAuthStatus = async () => {
-            console.log("[GUARD] Verificando status de autenticação inicial...");
-            // Pergunta ao processo main se já existe uma sessão válida
             const authenticated = await window.ipc.isAuthenticated();
-            console.log("[GUARD] Resposta do main:", authenticated);
             setIsAuthenticated(authenticated);
             setIsAuthLoading(false);
         };
         checkAuthStatus();
     }, []);
 
-    // Efeito que verifica a licença APENAS se estiver autenticado
-    useEffect(() => {
-        const checkLicense = async () => {
-            if (isAuthenticated) {
-                console.log("[GUARD] Usuário autenticado. Verificando licença...");
-                try {
-                    // Pede o token de acesso para o processo main
-                    const token = await window.ipc.getAccessToken();
-                    if (!token) {
-                        throw new Error("Token de acesso não disponível.");
-                    }
+    // A lógica de verificação agora está em um useCallback para ser reutilizável
+    const checkLicense = useCallback(async () => {
+        if (isAuthenticated) {
+            try {
+                const token = await window.ipc.getAccessToken();
+                if (!token) throw new Error("Token de acesso não disponível.");
+                
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const response = await fetch(`${apiBaseUrl}/api/subscription/details`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
 
-                    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-                    const response = await fetch(`${apiBaseUrl}/api/subscription/details`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.status === 'active') {
-                            console.log("[GUARD] Licença VÁLIDA encontrada!");
-                            setIsLicenseValid(true);
-                        } else {
-                            console.log("[GUARD] Licença encontrada, mas com status:", data.status);
-                        }
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'active') {
+                        setIsLicenseValid(true);
                     } else {
-                        console.log("[GUARD] Resposta de verificação de licença não foi OK.");
                         setIsLicenseValid(false);
                     }
-                } catch (error) {
-                    console.error("[GUARD] Erro ao verificar a licença:", error);
+                } else {
                     setIsLicenseValid(false);
-                } finally {
-                    setIsLicenseCheckLoading(false);
                 }
-            } else {
-                // Se não está autenticado, não há licença para verificar
+            } catch (error) {
+                console.error("[GUARD] Erro ao verificar a licença:", error);
+                setIsLicenseValid(false);
+            }
+        }
+    }, [isAuthenticated]);
+
+    // Efeito que executa a verificação da licença na primeira carga
+    useEffect(() => {
+        const runInitialCheck = async () => {
+            if (!isAuthLoading) {
+                await checkLicense();
                 setIsLicenseCheckLoading(false);
             }
         };
-        
-        // Só roda a verificação de licença depois que a verificação de auth terminar
-        if (!isAuthLoading) {
-            checkLicense();
-        }
-    }, [isAuthenticated, isAuthLoading]);
+        runInitialCheck();
+    }, [isAuthenticated, isAuthLoading, checkLicense]);
+
+    // Função para o botão "Verificar Novamente"
+    const handleRecheckLicense = async () => {
+        if (isRechecking) return;
+        setIsRechecking(true);
+        await checkLicense();
+        setIsRechecking(false);
+    };
 
     // --- Renderização Condicional ---
     if (isAuthLoading || isLicenseCheckLoading) {
-        return <Flex w="100vw" h="100vh" justify="center" align="center" bg="gray.800"><Spinner size="xl" color="blue.500" /></Flex>;
+        return <Flex w="100vw" h="100vh" justify="center" align="center" bg="blue.950"><Spinner size="xl" color="blue.500" /></Flex>;
     }
     if (isAuthenticated && isLicenseValid) {
         return <>{children}</>;
     }
     if (isAuthenticated && !isLicenseValid) {
-        return <InvalidLicenseScreen />;
+        return <InvalidLicenseScreen onRecheckLicense={handleRecheckLicense} isRechecking={isRechecking} />;
     }
     return <LoginScreen />;
 }

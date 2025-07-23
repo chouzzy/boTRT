@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Flex, Text, Link, VStack, Heading, Image } from '@chakra-ui/react';
+import { Flex, Text, Link, VStack, Heading, Image, Button } from '@chakra-ui/react';
 import NextLink from 'next/link'; // Para navegação Next.js
 import { useColorModeValue } from '../ui/color-mode';
 import { NavItem, sideBar } from 'renderer/data/textData';
@@ -39,7 +39,7 @@ export function SideMenu() {
         >
             {/* Seção do Logo */}
             <Flex mb={10} w='100%' alignItems="center" justifyContent="center">
-                <Image src={'images/logo.svg'} alt='logo' boxSize={24}/>
+                <Image src={'images/logo.svg'} alt='logo' boxSize={24} />
             </Flex>
 
             {/* Seção Principal de Navegação */}
@@ -71,6 +71,11 @@ export function SideMenu() {
                     />
                 ))}
             </VStack>
+            <Flex py={2}>
+                <Button onClick={() => window.ipc.logout()} bgColor={'transparent'} border={'1px solid white'} color={'white'} _hover={{ bgColor: 'brand.600', borderColor:'transparent' }} size='xs' px={12}>
+                    Sair
+                </Button>
+            </Flex>
 
             <Flex>
                 <Text fontSize="xs" color={copyrightColor}>
