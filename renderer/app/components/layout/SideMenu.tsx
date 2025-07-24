@@ -16,9 +16,13 @@ export function SideMenu() {
     const { startLoading } = useLoading();
 
     // Cores do tema (assumindo que você tem um fundo escuro)
-    const bgColor = useColorModeValue('gray.800', 'gray.900'); // Fundo escuro
-    const logoColor = useColorModeValue('white', 'white');
     const copyrightColor = useColorModeValue('gray.600', 'gray.600');
+
+    const handleLogout = () => {
+        // Chama a função de logout exposta no preload.js
+        window.ipc.logout();
+    };
+
 
     return (
         <Flex
@@ -72,7 +76,7 @@ export function SideMenu() {
                 ))}
             </VStack>
             <Flex py={2}>
-                <Button onClick={() => window.ipc.logout()} bgColor={'transparent'} border={'1px solid white'} color={'white'} _hover={{ bgColor: 'brand.600', borderColor:'transparent' }} size='xs' px={12}>
+                <Button onClick={handleLogout} bgColor={'transparent'} border={'1px solid white'} color={'white'} _hover={{ bgColor: 'brand.600', borderColor: 'transparent' }} size='xs' px={12}>
                     Sair
                 </Button>
             </Flex>

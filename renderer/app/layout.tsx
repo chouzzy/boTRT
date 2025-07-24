@@ -59,38 +59,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Auth0ProviderForDesktop>
             <LoadingProvider>
               <LoadingScreen />
-              <AuthenticationGuard>
+
+              <Flex
+                w='100%'
+                h='100%'
+                bgImage={'url(background/bg.png)'}
+                bgColor={'blue.950'}
+                bgPos={'center'}
+                bgSize={'cover'}
+                justifyContent='center'
+                alignItems='start'
+                color='ghostWhite'
+                pos={'relative'}
+                borderRadius={40}
+              >
                 <Flex
                   w='100%'
-                  h='100%'
-                  bgImage={'url(background/bg.png)'}
-                  bgColor={'blue.950'}
-                  bgPos={'center'}
-                  bgSize={'cover'}
-                  justifyContent='center'
-                  alignItems='start'
-                  color='ghostWhite'
-                  pos={'relative'}
-                  borderRadius={40}
-                >
-                  <Flex
-                    w='100%'
-                    h={28}
-                    pos={'absolute'}
-                    top={0}
-                    className='draggable-region'
-                    zIndex={0}
-                  />
-                  <EagerPrefetcher />
-                  <SideMenu />
-                  {children}
-                </Flex>
+                  h={28}
+                  pos={'absolute'}
+                  top={0}
+                  className='draggable-region'
+                  zIndex={0}
+                />
+                <EagerPrefetcher />
+                <AuthenticationGuard>
+                <SideMenu />
+                {children}
               </AuthenticationGuard>
-              <WindowButtons />
-            </LoadingProvider>
-          </Auth0ProviderForDesktop>
-        </Providers>
-      </body>
-    </html>
+            </Flex>
+            <WindowButtons />
+          </LoadingProvider>
+        </Auth0ProviderForDesktop>
+      </Providers>
+    </body>
+    </html >
   );
 }

@@ -190,10 +190,41 @@ ipcMain.handle('auth:get-access-token', async () => {
   return tokens?.access_token || null;
 });
 
+// --- Ouve o pedido de logout (LÓGICA ATUALIZADA E CORRIGIDA) ---
 ipcMain.on('auth:logout', () => {
-  store.delete('tokens');
-  mainWindow?.reload();
+    // 1. Limpa a sessão local no electron-store
+    store.delete('tokens');
+    console.log('[LOGOUT] Sessão local do BoTRT limpa.');
+
+    // 2. Recarrega a janela principal IMEDIATAMENTE para dar feedback ao usuário
+    mainWindow?.reload();
+    console.log('[LOGOUT] Janela principal recarregada.');
+
+    // 3. Constrói a URL de logout para limpar a sessão central (SSO)
+    const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN!;
+    const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!;
+    const returnTo = 'https://www.awer.co'; 
+
+    const logoutUrl = `https://${domain}/v2/logout?` +
+        `client_id=${clientId}&` +
+        `returnTo=${encodeURIComponent(returnTo)}&` +
+        `federated`;
+
+    // 4. Cria uma janela invisível para processar o logout em segundo plano
+    const logoutWindow = new BrowserWindow({ show: false });
+
+    logoutWindow.loadURL(logoutUrl);
+
+    // Ouve o redirecionamento para saber quando o logout foi concluído e fechar a janela
+    logoutWindow.webContents.on('will-redirect', (event, url) => {
+        if (url.startsWith(returnTo)) {
+            console.log('[LOGOUT] Sessão do Auth0 e do provedor (Google) limpa com sucesso.');
+            logoutWindow.close();
+        }
+    });
 });
+
+
 
 ipcMain.on('open-external-link', (event, url) => {
   shell.openExternal(url);
