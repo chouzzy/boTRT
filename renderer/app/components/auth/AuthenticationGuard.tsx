@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Flex, Spinner, Heading, Text, Button, VStack, Icon, HStack, Image } from '@chakra-ui/react';
-import { PiSignIn, PiWarningCircleFill, PiArrowClockwise, PiSmileyXEyesLight } from 'react-icons/pi';
+import { PiSignIn, PiWarningCircleFill, PiSmileyXEyesLight } from 'react-icons/pi';
 
 // ============================================================================
 //   SUB-COMPONENTE: Tela de Login
@@ -41,31 +41,26 @@ interface InvalidLicenseScreenProps {
 
 function InvalidLicenseScreen({ onRecheckLicense, isRechecking }: InvalidLicenseScreenProps) {
     
-    // A MUDANÇA: Estado para o contador regressivo
     const [countdown, setCountdown] = useState(10);
 
     // Efeito para verificação automática (Polling)
     useEffect(() => {
         const intervalId = setInterval(() => {
             if (!isRechecking) {
-                console.log("[POLLING] Verificando licença automaticamente...");
                 onRecheckLicense();
             }
         }, 10000); // 10 segundos
         return () => clearInterval(intervalId);
     }, [onRecheckLicense, isRechecking]);
 
-    // A MUDANÇA: Efeito para o contador visual
+    // Efeito para o contador visual
     useEffect(() => {
-        // Zera o contador quando uma verificação começa
         if (isRechecking) {
             setCountdown(10);
         }
-        
         const countdownInterval = setInterval(() => {
             setCountdown(prev => (prev > 1 ? prev - 1 : 10));
         }, 1000); // 1 segundo
-
         return () => clearInterval(countdownInterval);
     }, [isRechecking]);
 
@@ -90,7 +85,6 @@ function InvalidLicenseScreen({ onRecheckLicense, isRechecking }: InvalidLicense
                     </Button>
                 </HStack>
                 
-                {/* A MUDANÇA: Contador no canto da tela */}
                 <Flex
                     position="absolute"
                     bottom={4}
@@ -141,10 +135,12 @@ export function AuthenticationGuard({ children }: { children: React.ReactNode })
                 const response = await fetch(`${apiBaseUrl}/api/subscription/details`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-
+                
+                const responsejson = await response.json();
+                
                 if (response.ok) {
-                    const data = await response.json();
-                    if (data.status === 'active') {
+                    console.log("[GUARD] Licença verificada:", responsejson);
+                    if (responsejson.status === 'active') {
                         setIsLicenseValid(true);
                     } else {
                         setIsLicenseValid(false);
@@ -170,7 +166,7 @@ export function AuthenticationGuard({ children }: { children: React.ReactNode })
         runInitialCheck();
     }, [isAuthenticated, isAuthLoading, checkLicense]);
 
-    // Função para o botão "Verificar Novamente"
+    // Função para o polling de verificação
     const handleRecheckLicense = async () => {
         if (isRechecking) return;
         setIsRechecking(true);
