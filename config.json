@@ -1,0 +1,10 @@
+{
+  "auth0": {
+    "domain": "dev-pzivs8swerlhnydf.us.auth0.com",
+    "clientId": "xWxVdNhe14NRbjACn1cCrbEZpDt12Gh8",
+    "audience": "https://auth.awer.co"
+  },
+  "api": {
+    "baseUrl": "https://api.botrt.awer.co"
+  }
+}

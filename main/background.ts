@@ -17,11 +17,17 @@ import { initializeIpcHandlers } from './ipcHandlers/ipcHandlers';
 // ============================================================================
 //   CONFIGURAÇÃO INICIAL
 // ============================================================================
+
+import config from '../config.json';
+
 const isProd = process.env.NODE_ENV === 'production';
 // Usamos um namespace para garantir que os dados de autenticação fiquem isolados
 const store = new Store({ name: 'auth_session' });
 // Carrega as variáveis de ambiente do arquivo renderer/.env para o processo main
-dotenv.config({ path: path.resolve(app.getAppPath(), 'renderer', '.env') });
+const envPath = isProd
+  ? path.resolve(__dirname, '..', 'renderer', '.env')
+  : path.resolve(__dirname, '..', 'renderer', '.env'); // O caminho é o mesmo em dev
+dotenv.config({ path: envPath });
 
 // --- Funções Auxiliares de Criptografia (Padrão PKCE) ---
 function base64URLEncode(str: Buffer): string {
@@ -105,9 +111,7 @@ ipcMain.on('auth:start-login', async () => {
     store.set('pkce_code_verifier', codeVerifier);
     const codeChallenge = base64URLEncode(sha256(Buffer.from(codeVerifier, 'ascii')));
 
-    const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN!;
-    const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!;
-    const audience = process.env.NEXT_PUBLIC_API_AUDIENCE!;
+    const { domain, clientId, audience } = config.auth0;
 
     const authUrl = `https://${domain}/authorize?` +
       `audience=${audience}&` +
@@ -120,8 +124,8 @@ ipcMain.on('auth:start-login', async () => {
 
     // Cria a nova janela de login dedicada
     authWindow = new BrowserWindow({
-      width: 500,
-      height: 600,
+      width: 600,
+      height: 800,
       modal: true,
       parent: mainWindow!,
       webPreferences: { nodeIntegration: false, contextIsolation: true },
@@ -152,8 +156,7 @@ const handleAuthCallback = async (url: string) => {
         if (!codeVerifier) throw new Error("Code Verifier não encontrado.");
         store.delete('pkce_code_verifier');
 
-        const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN!;
-        const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!;
+        const { domain, clientId } = config.auth0;
 
         const response = await axios.post(`https://${domain}/oauth/token`, new URLSearchParams({
           grant_type: 'authorization_code',
@@ -192,36 +195,35 @@ ipcMain.handle('auth:get-access-token', async () => {
 
 // --- Ouve o pedido de logout (LÓGICA ATUALIZADA E CORRIGIDA) ---
 ipcMain.on('auth:logout', () => {
-    // 1. Limpa a sessão local no electron-store
-    store.delete('tokens');
-    console.log('[LOGOUT] Sessão local do BoTRT limpa.');
+  // 1. Limpa a sessão local no electron-store
+  store.delete('tokens');
+  console.log('[LOGOUT] Sessão local do BoTRT limpa.');
 
-    // 2. Recarrega a janela principal IMEDIATAMENTE para dar feedback ao usuário
-    mainWindow?.reload();
-    console.log('[LOGOUT] Janela principal recarregada.');
+  // 2. Recarrega a janela principal IMEDIATAMENTE para dar feedback ao usuário
+  mainWindow?.reload();
+  console.log('[LOGOUT] Janela principal recarregada.');
 
-    // 3. Constrói a URL de logout para limpar a sessão central (SSO)
-    const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN!;
-    const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!;
-    const returnTo = 'https://www.awer.co'; 
+  // 3. Constrói a URL de logout para limpar a sessão central (SSO)
+  const { domain, clientId } = config.auth0;
+  const returnTo = 'https://www.awer.co';
 
-    const logoutUrl = `https://${domain}/v2/logout?` +
-        `client_id=${clientId}&` +
-        `returnTo=${encodeURIComponent(returnTo)}&` +
-        `federated`;
+  const logoutUrl = `https://${domain}/v2/logout?` +
+    `client_id=${clientId}&` +
+    `returnTo=${encodeURIComponent(returnTo)}&` +
+    `federated`;
 
-    // 4. Cria uma janela invisível para processar o logout em segundo plano
-    const logoutWindow = new BrowserWindow({ show: false });
+  // 4. Cria uma janela invisível para processar o logout em segundo plano
+  const logoutWindow = new BrowserWindow({ show: false });
 
-    logoutWindow.loadURL(logoutUrl);
+  logoutWindow.loadURL(logoutUrl);
 
-    // Ouve o redirecionamento para saber quando o logout foi concluído e fechar a janela
-    logoutWindow.webContents.on('will-redirect', (event, url) => {
-        if (url.startsWith(returnTo)) {
-            console.log('[LOGOUT] Sessão do Auth0 e do provedor (Google) limpa com sucesso.');
-            logoutWindow.close();
-        }
-    });
+  // Ouve o redirecionamento para saber quando o logout foi concluído e fechar a janela
+  logoutWindow.webContents.on('will-redirect', (event, url) => {
+    if (url.startsWith(returnTo)) {
+      console.log('[LOGOUT] Sessão do Auth0 e do provedor (Google) limpa com sucesso.');
+      logoutWindow.close();
+    }
+  });
 });
 
 
