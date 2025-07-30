@@ -39,29 +39,29 @@ const config = defineConfig({
                 bodyBg: {
                     // Valor literal 'white' para base
                     // String de referência '{colors.path.to.token}' para _dark
-                    value: { base: "{color.ghostWhite}", _dark: "#18181baa" }
+                    value: { base: "#18181baa", _dark: "#18181baa" }
                 },
                 preHeaderBg: {
-                    value: { base: "black", _dark: "white" }
+                    value: { base: "white", _dark: "white" }
                 },
                 invertedColor: {
-                    value: { base: "white", _dark: "black" }
+                    value: { base: "black", _dark: "black" }
                 },
                 spinnerColor: {
-                    value: { base: "black", _dark: "white" }
+                    value: { base: "white", _dark: "white" }
                 },
                 // Cor principal do texto no corpo
                 textPrimary: {
-                    value: { base: "{colors.gray.800}", _dark: "{colors.whiteAlpha.900}" }
+                    value: { base: "{colors.whiteAlpha.900}", _dark: "{colors.whiteAlpha.900}" }
                 },
                 // Cor de texto secundária/mais clara
                 textSecondary: {
-                    value: { base: "{colors.gray.600}", _dark: "{colors.gray.400}" }
+                    value: { base: "{colors.gray.400}", _dark: "{colors.gray.400}" }
                 },
                 // Cor de fundo do cabeçalho (Exemplo)
                 headerBg: {
                     // Pode usar um literal ou referenciar outro token
-                    value: { base: "white", _dark: "black" }
+                    value: { base: "black", _dark: "black" }
                 },
                 // Cor do texto no cabeçalho (Exemplo)
                 headerText: {
@@ -71,15 +71,15 @@ const config = defineConfig({
                 },
                 // Cor de destaque (sua cor #FF5F5E)
                 accent: {
-                    value: { base: "{colors.brand.500}", _dark: "{colors.brand.400}" }
+                    value: { base: "{colors.brand.400}", _dark: "{colors.brand.400}" }
                 },
                 // Cor para bordas discretas
                 borderSubtle: {
-                    value: { base: "{colors.gray.200}", _dark: "{colors.whiteAlpha.300}" }
+                    value: { base: "{colors.whiteAlpha.300}", _dark: "{colors.whiteAlpha.300}" }
                 },
                 // Cor de fundo para elementos como cards
                 cardBg: {
-                    value: { base: "{colors.gray.50}", _dark: "{colors.gray.900}" }
+                    value: { base: "{colors.gray.900}", _dark: "{colors.gray.900}" }
                 },
                 buttonBg: {
                     value: { base: "{colors.brand.500}", _dark: "{colors.brand.500}" }
@@ -88,64 +88,64 @@ const config = defineConfig({
                     value: { base: "{colors.cadetBlue}", _dark: "{colors.cadetBlue}" }
                 },
                 buttonDarkBgHover: {
-                    value: { base: "light", _dark: "black" }
+                    value: { base: "black", _dark: "black" }
                 },
                 buttonColor: {
                     value: { base: "white", _dark: "white" }
                 },
                 buttonDarkColor: {
-                    value: { base: "white", _dark: "black" }
+                    value: { base: "black", _dark: "black" }
                 },
                 buttonColorHover: {
-                    value: { base: "white", _dark: "black" }
+                    value: { base: "black", _dark: "black" }
                 },
                 buttonDarkColorHover: {
-                    value: { base: "black", _dark: "white" }
+                    value: { base: "white", _dark: "white" }
                 },
                 brandBg: {
-                    value: { base: "#F5F4F4", _dark: "#040404" }
+                    value: { base: "#040404", _dark: "#040404" }
                 },
                 borderColor: {
-                    value: { base: "#00000022", _dark: "#FFFFFF22" }
+                    value: { base: "#FFFFFF22", _dark: "#FFFFFF22" }
                 },
                 headerColor: {
-                    value: { base: "#00000077", _dark: "#9E9E9E" }
+                    value: { base: "#9E9E9E", _dark: "#9E9E9E" }
                 },
                 mainColor: {
-                    value: { base: "black", _dark: "white" }
+                    value: { base: "white", _dark: "white" }
                 },
                 mainSubColor: {
-                    value: { base: "#00000077", _dark: "#9E9E9E" }
+                    value: { base: "#9E9E9E", _dark: "#9E9E9E" }
                 },
                 showCaseBg:{
-                    value: { base: "#00000077", _dark: "{colors.gray.900}" }
+                    value: { base: "{colors.gray.900}", _dark: "{colors.gray.900}" }
                 },
                 showCaseBorder:{
-                    value: { base: "#00000077", _dark: "#13141588" }
+                    value: { base: "#13141588", _dark: "#13141588" }
                 },
                 footerBg: {
-                    value: { base: "{colors.gray.200}", _dark: "#18181C" }
+                    value: { base: "#18181C", _dark: "#18181C" }
                 },
                 footerColor: {
-                    value: { base: "#00000077", _dark: "#9E9E9E" }
+                    value: { base: "#9E9E9E", _dark: "#9E9E9E" }
                 },
                 footerHeaderColor: {
-                    value: { base: "black", _dark: "white" }
+                    value: { base: "white", _dark: "white" }
                 },
                 bottomFooterBg: {
-                    value: { base: "{color.ghostWhite}", _dark: "black" }
+                    value: { base: "black", _dark: "black" }
                 },
                 bottomFooterColor: {
-                    value: { base: "#00000077", _dark: "#9E9E9E" }
+                    value: { base: "#9E9E9E", _dark: "#9E9E9E" }
                 },
                 bottomFooterHeaderColor: {
-                    value: { base: "black", _dark: "white" }
+                    value: { base: "white", _dark: "white" }
                 },
                 bottomFooterIconBg: {
-                    value: { base: "{colors.gray.200}", _dark: "{colors.gray.900}" }
+                    value: { base: "{colors.gray.900}", _dark: "{colors.gray.900}" }
                 },
                 bottomFooterIconBgHover: {
-                    value: { base: "{colors.gray.300}", _dark: "{colors.gray.700}" }
+                    value: { base: "{colors.gray.700}", _dark: "{colors.gray.700}" }
                 },
                 brandGradient: {
                     value: { base: '#FF5251', _dark: "#FF5251" }
