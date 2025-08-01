@@ -1,12 +1,33 @@
+# appId e productName: Identificadores do seu aplicativo.
 appId: co.awer.botrt
 productName: BoTRT
 copyright: Copyright © 2025 Awer Associados Servicos de Apoio A Atividades Empresariais LTDA
+
+# directories: Onde encontrar os recursos e onde salvar a build final.
 directories:
   output: dist
-  buildResources: resources
+  buildResources: resources # Pasta para ícones, certificado, etc.
+
+# files: Define quais arquivos devem ser incluídos no pacote final.
 files:
   - from: .
     filter:
       - package.json
       - app
-publish: null
+      - main
+      - renderer
+
+# publish: Configura o deploy para o GitHub Releases.
+publish:
+  provider: github
+  owner: chouzzy
+  repo: boTRT # VERIFIQUE SE ESTE É O NOME CORRETO DO REPOSITÓRIO
+
+# win: Configurações específicas para a build do Windows.
+win:
+  # publisherName: O nome que aparecerá como publicador verificado.
+  publisherName: Awer Associados Servicos de Apoio A Atividades Empresariais LTDA
+  
+  # A MÁGICA: Aponta para o certificado e habilita a assinatura.
+  # O electron-builder vai procurar a senha automaticamente na variável de ambiente CSC_KEY_PASSWORD.
+  certificateFile: resources/awer-certificate.pfx

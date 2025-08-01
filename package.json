@@ -2,12 +2,12 @@
   "private": true,
   "name": "BoTRT",
   "description": "A powerful and user-friendly web scraping tool designed to simplify data extraction from websites.",
-  "version": "0.0.901",
+  "version": "0.0.92",
   "author": "Matheus Farias <mathfernando@hotmail.com",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
-    "build": "nextron build",
+    "build": "dotenv -e .env -- nextron build",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@types/react": "^19.1.6",
+    "dotenv-cli": "^9.0.0",
     "electron": "^34.0.0",
     "electron-builder": "^24.13.3",
     "next": "^14.2.4",
