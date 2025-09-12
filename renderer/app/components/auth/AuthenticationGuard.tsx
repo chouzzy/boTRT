@@ -108,6 +108,39 @@ function InvalidLicenseScreen({ onRecheckLicense, isRechecking }: InvalidLicense
                 {isRechecking ? 'Verificando...' : `Próxima verificação em ${countdown}s`}
                 </Text>
             </Flex>
+=======
+                <Icon as={PiSmileyXEyesLight} boxSize={16} color="brand.500" />
+                <Heading size="lg">Assinatura Não Encontrada</Heading>
+                <Text textAlign="center" maxW="md">
+                    Se você acabou de assinar, aguarde um momento enquanto validamos seu plano. O aplicativo verificará novamente em alguns segundos.
+                </Text>
+                <HStack gap={4} w="100%" justify="center" pt={4}>
+                    <Button
+                        variant="outline"
+                        bgColor={'brand.500'}
+                        _hover={{ bgColor: 'brand.600' }}
+                        onClick={() => {
+                            window.ipc.openExternal('https://www.awer.co/tecnologia/botrt');
+                        }}
+                    >
+                        Ver Planos
+                    </Button>
+                </HStack>
+                
+                <Flex
+                    position="absolute"
+                    bottom={4}
+                    right={4}
+                    align="center"
+                    gap={2}
+                    color="gray.400"
+                    fontSize="xs"
+                >
+                    <Spinner size="xs" opacity={isRechecking ? 1 : 0} />
+                    <Text>
+                        {isRechecking ? 'Verificando...' : `Próxima verificação em ${countdown}s`}
+                    </Text>
+                </Flex>
             </VStack>
         </Flex>
     );

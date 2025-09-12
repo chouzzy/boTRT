@@ -81,7 +81,6 @@ const handler = {
 
     scrapeCeat: (cnpj: string) => ipcRenderer.send('scrape-ceat', { cnpj }),
 
-
     // No seu handler do preload.js
     processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string }) =>
         ipcRenderer.send('process-excel-file', data),

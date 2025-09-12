@@ -1,9 +1,8 @@
+
 # appId e productName: Identificadores do seu aplicativo.
 appId: co.awer.botrt
 productName: BoTRT
 copyright: Copyright © 2025 Awer Associados Servicos de Apoio A Atividades Empresariais LTDA
-
-# directories: Onde encontrar os recursos e onde salvar a build final.
 directories:
   output: dist
   buildResources: resources # Pasta para ícones, certificado, etc.
