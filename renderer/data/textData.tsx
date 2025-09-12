@@ -66,6 +66,7 @@ export interface NavItem {
 const mainNavItems: NavItem[] = [
     { label: 'Página inicial', href: '/', icon: <PiHouseBold size={24} /> },
     { label: 'Nova Busca', href: '/NewSearch', icon: <PiMagnifyingGlassBold size={24} /> },
+    { label: 'CEAT', href: '/Ceat', icon: <PiMagnifyingGlassBold size={24} /> },
     { label: 'Histórico de Buscas', href: '/SearchHistory', icon: <PiBookBold size={24} /> },
     { label: 'Buscas Agendadas', href: '/ScheduleSearch', icon: <PiArchiveBold size={24} /> },
     { label: 'Configurações', href: '/SettingsPage', icon: <PiGearBold size={24} /> },

@@ -30,4 +30,4 @@ win:
   
   # A MÁGICA: Aponta para o certificado e habilita a assinatura.
   # O electron-builder vai procurar a senha automaticamente na variável de ambiente CSC_KEY_PASSWORD.
-  certificateFile: resources/awer-certificate.pfx
+  # certificateFile: resources/awer-certificate.pfx

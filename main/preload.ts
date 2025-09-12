@@ -79,6 +79,9 @@ const handler = {
 
     openExternal: (url: string) => ipcRenderer.send('open-external-link', url),
 
+    scrapeCeat: (cnpj: string) => ipcRenderer.send('scrape-ceat', { cnpj }),
+
+
     // No seu handler do preload.js
     processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string }) =>
         ipcRenderer.send('process-excel-file', data),
