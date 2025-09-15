@@ -26,6 +26,7 @@ export function SideMenu() {
             w={{ base: 'full', md: 'sm' }}
             h={{ base: 'auto', md: '100vh' }}
             bg={'bodyBg'}
+            borderLeftRadius={{ base: 0, md: 40 }}
             // AJUSTE: Padding responsivo
             px={{ base: 4, md: 4 }}
             py={{ base: 2, md: 12 }}
@@ -39,7 +40,7 @@ export function SideMenu() {
             justifyContent={{ base: 'space-around', md: 'center' }}
             alignItems={'center'}
             // AJUSTE: Bordas arredondadas apenas para a versão desktop (lateral)
-            borderRadius={{ base: 0, md: '0 20px 20px 0' }}
+            // borderRadius={{ base: 0, md: '0 20px 20px 0' }}
         >
             {/* Seção do Logo - Visível apenas em Desktop */}
             <Flex
@@ -50,17 +51,17 @@ export function SideMenu() {
                 // AJUSTE: Esconde o logo em telas pequenas
                 display={{ base: 'none', md: 'flex' }}
             >
-                <Image src={'images/logo.svg'} alt='logo' boxSize={24} />
+                <Image src={'/images/logo.svg'} alt='logo' boxSize={24} />
             </Flex>
 
             {/* AJUSTE: Usar HStack para navegação principal em mobile */}
             <Flex
                 w='100%'
-                gap={{ base: 4, md: 2 }}
+                gap={{ base: 4, md: 3 }}
                 align="stretch"
                 flex={{ base: '1', md: '1' }}
                 direction={{ base: 'row', md: 'column' }}
-                justifyContent={{ base: 'start', md: 'start' }}
+                justifyContent={{ base: 'start', md: 'flex-start' }}
                 textTransform={'uppercase'}
             >
                 {mainNavItems.map((item) => (
@@ -128,7 +129,7 @@ function NavLink({ item, isActive, onClick }: NavLinkProps) {
     const hoverColor = useColorModeValue('white', 'white');
 
     return (
-        <TransitionLink href={item.href} style={{ flexGrow: 1 }}>
+        <TransitionLink href={item.href} >
             <Flex
                 onClick={onClick}
                 alignItems="center"

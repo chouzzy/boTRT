@@ -66,16 +66,16 @@ export interface NavItem {
 const mainNavItems: NavItem[] = [
     { label: 'Página inicial', href: '/', icon: <PiHouseBold size={24} /> },
     { label: 'Nova Busca', href: '/NewSearch', icon: <PiMagnifyingGlassBold size={24} /> },
-    { label: 'CEAT', href: '/Ceat', icon: <PiMagnifyingGlassBold size={24} /> },
+    // { label: 'CEAT', href: '/Ceat', icon: <PiMagnifyingGlassBold size={24} /> },
     { label: 'Histórico de Buscas', href: '/SearchHistory', icon: <PiBookBold size={24} /> },
     { label: 'Buscas Agendadas', href: '/ScheduleSearch', icon: <PiArchiveBold size={24} /> },
-    { label: 'Configurações', href: '/SettingsPage', icon: <PiGearBold size={24} /> },
+    // { label: 'Configurações', href: '/SettingsPage', icon: <PiGearBold size={24} /> },
     { label: 'Licença e Ativação', href: '/LicensePage', icon: <PiKeyBold size={24} /> },
 ];
 
 const supportNavItems: NavItem[] = [
     { label: 'SUPORTE', href: '/SupportPage',  icon: <PiPhoneBold size={24} />  },
-    { label: 'CONTATO', href: '/ContactPage',  icon: <PiKeyboardBold size={24} />  },
+    // { label: 'CONTATO', href: '/ContactPage',  icon: <PiKeyboardBold size={24} />  },
 ];
 
 export const sideBar = {

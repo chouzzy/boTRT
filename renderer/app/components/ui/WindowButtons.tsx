@@ -23,7 +23,7 @@ export function WindowButtons() {
             >
                 <PiMinusBold size={32} />
             </IconButton>
-            <IconButton
+            {/* <IconButton
                 borderRadius={'none'}
                 aria-label="Close"
                 _hover={{ bgColor: 'ghostWhite', color: 'brand.500', transition: 'all 0.3s ease-in-out' }}
@@ -34,7 +34,7 @@ export function WindowButtons() {
                 variant="ghost"
             >
                 <PiSquareBold size={32} />
-            </IconButton>
+            </IconButton> */}
             <IconButton
                 borderRadius={'none'}
                 aria-label="Close"

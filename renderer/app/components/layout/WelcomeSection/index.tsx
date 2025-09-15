@@ -77,8 +77,8 @@ export function WelcomeSection() {
                 alignItems={{ base: 'center', md: 'start' }}
                 textAlign={{ base: 'start', md: 'left' }}
             >
-                <Flex flexDir={'column'} gap={8}>
-                    <Flex flexDir={'column'} lineHeight={1.1} gap={{ base: 4, md: 6 }}>
+                <Flex flexDir={'column'} gap={4}>
+                    <Flex flexDir={'column'} lineHeight={1.1} gap={{ base: 4, md: 2}}>
                         <CustomText
                             text={title}
                             // AJUSTE: Fonte responsiva
@@ -91,7 +91,7 @@ export function WelcomeSection() {
                             text={subtitle}
                             fontWeight={'700'}
                             // AJUSTE CRÍTICO: Fonte gigante agora é responsiva
-                            fontSize={{ base: 'xl', sm: '8xl', md: '8xl', lg: '9xl' }}
+                            fontSize={{ base: 'xl', sm: '8xl', md: '8xl', lg: '8xl' }}
                             letterSpacing={0.1}
                         />
                     </Flex>
@@ -101,7 +101,7 @@ export function WelcomeSection() {
                             text={description}
                             fontWeight={'light'}
                             // AJUSTE: Fonte responsiva
-                            fontSize={{ base: 'md', lg: 'lg' }}
+                            fontSize={{ base: 'md', lg: 'md' }}
                             maxW={{ base: '90%', md: '100%' }} // Evita que o texto encoste nas bordas
                         />
                     </Flex>
