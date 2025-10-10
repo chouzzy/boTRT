@@ -13,7 +13,7 @@ export async function consumeMinhaPautaApi(
     trt: number,
     credentials: credentials,
     startPuppeteer: PuppeteerCallback,
-    mainWindow: Electron.CrossProcessExports.BrowserWindow
+    mainWindow: Electron.CrossProcessExports.BrowserWindow,
 ) {
 
     try {
@@ -62,7 +62,12 @@ export async function consumeMinhaPautaApi(
                     await page.type('::-p-xpath(//*[@id="username"])', user);
                     await page.type('::-p-xpath(//*[@id="password"])', password);
                     
-                    await page.click('::-p-xpath(//*[@id="kc-login"])');
+                    console.log('clicando no login')
+                    await setTimeout(async () => {
+                        console.log('clicou no login')
+                        console.log('password: ', password)
+                        await page.click('::-p-xpath(//*[@id="kc-login"])');
+                    }, 10000);
                 }
             }
 
@@ -159,7 +164,7 @@ export async function consumeMinhaPautaApi(
                 throw error
             }
 
-            const html = await page.$eval('pre', el => el.textContent);
+            const html = await page.$eval('pre', (el: HTMLPreElement) => el.textContent);
 
             const json: ApiMinhaPautaResponse = JSON.parse(html);
 

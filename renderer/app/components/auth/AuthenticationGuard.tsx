@@ -149,7 +149,7 @@ export function AuthenticationGuard({ children }: { children: React.ReactNode })
                 
                 if (response.ok) {
                     console.log("[GUARD] Licença verificada:", responsejson);
-                    if (responsejson.status === 'active') {
+                    if (responsejson.status === 'active' || responsejson.status === 'trialing') {
                         setIsLicenseValid(true);
                     } else {
                         setIsLicenseValid(false);

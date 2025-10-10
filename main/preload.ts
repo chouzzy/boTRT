@@ -70,6 +70,9 @@ const handler = {
     // --- GERENCIAMENTO DE SESSÃO ---
     // Renderer -> Main: Pergunta se o usuário está autenticado (ao iniciar o app).
     isAuthenticated: (): Promise<boolean> => ipcRenderer.invoke('auth:is-authenticated'),
+    
+    // Renderer -> Main: Pede os dados do perfil do usuário.
+    getUserProfile: () => ipcRenderer.invoke('auth:get-user-profile'),
 
     // Renderer -> Main: Pede o token de acesso para fazer chamadas de API.
     getAccessToken: (): Promise<string | null> => ipcRenderer.invoke('auth:get-access-token'),

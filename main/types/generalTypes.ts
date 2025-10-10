@@ -38,8 +38,10 @@ export interface audistProps {
   };
   tipo: { descricao: string; }
 }
+import * as exceljs from 'exceljs';
+
 export interface importDataProps {
-  fileBuffer: Buffer<ArrayBufferLike>
+  fileBuffer: exceljs.Buffer
   operationType: string
 }
 

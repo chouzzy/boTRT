@@ -4,7 +4,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import { MainBostExcelService, MainBostService, handleSaveExcel } from '../services/CrawlerService';
 import { importDataProps, ScrapeData } from "../types/generalTypes"; // Seus tipos
 import { saveErrorLog } from "../helpers/logUtils";
-import { CeatCrawlerService } from "../services/CeatCrawlerService";
+// import { CeatCrawlerService } from "../services/CeatCrawlerService";
 
 interface InitializeHandlersProps {
     mainWindow: BrowserWindow;
@@ -48,20 +48,31 @@ export async function initializeIpcHandlers({ mainWindow }: InitializeHandlersPr
         }
     });
 
-    ipcMain.on('scrape-ceat', async (event, { cnpj }: { cnpj: string }) => {
-        console.log(`IPC Handler: Recebido 'scrape-ceat' para o CNPJ: ${cnpj}`);
-        try {
-            // Chama o nosso novo serviço dedicado para a extração do CEAT
-            await CeatCrawlerService(mainWindow, { cnpj });
-        } catch (error: any) {
-            console.error("Handler 'scrape-ceat' encontrou um erro vindo do serviço:", error.message);
-            // TODO: Enviar uma mensagem de erro de volta para o frontend
-            mainWindow.webContents.send('process-finished', {
-                success: false,
-                message: `Falha na extração do CEAT: ${error.message}`
-            });
-        }
-    });
+    // // HANDLER DO CEAT ATUALIZADO
+    // // A assinatura foi ajustada para receber apenas o CNPJ como string
+    // ipcMain.handle('scrape-ceat', async (event, cnpj: string) => {
+    //     console.log(`IPC Handler: Recebido 'scrape-ceat' para o CNPJ: ${cnpj}`);
+    //     try {
+    //         // Chama o serviço e aguarda os resultados
+    //         const results = await CeatCrawlerService(mainWindow, { cnpj });
+
+    //         // Envia o resultado de sucesso de volta para o frontend
+    //         // Usando 'handle' o retorno já é a resposta para o 'invoke' do frontend
+    //         return {
+    //             success: true,
+    //             message: `${results.length} processo(s) extraído(s) com sucesso!`,
+    //             data: results
+    //         };
+
+    //     } catch (error: any) {
+    //         console.error("Handler 'scrape-ceat' encontrou um erro vindo do serviço:", error.message);
+    //         // Retorna o erro para o frontend
+    //         return {
+    //             success: false,
+    //             error: `Falha na extração do CEAT: ${error.message}`
+    //         };
+    //     }
+    // });
 
     ipcMain.on('window-close', (event) => {
         console.log("IPC Handler: Recebido 'window-close'");

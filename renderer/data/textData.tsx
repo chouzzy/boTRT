@@ -70,7 +70,7 @@ const mainNavItems: NavItem[] = [
     { label: 'Histórico de Buscas', href: '/SearchHistory', icon: <PiBookBold size={24} /> },
     { label: 'Buscas Agendadas', href: '/ScheduleSearch', icon: <PiArchiveBold size={24} /> },
     // { label: 'Configurações', href: '/SettingsPage', icon: <PiGearBold size={24} /> },
-    { label: 'Licença e Ativação', href: '/LicensePage', icon: <PiKeyBold size={24} /> },
+    // { label: 'Licença e Ativação', href: '/LicensePage', icon: <PiKeyBold size={24} /> },
 ];
 
 const supportNavItems: NavItem[] = [

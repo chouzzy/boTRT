@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Flex, Text, VStack, Image, Button, HStack } from '@chakra-ui/react';
+import { Flex, Text, VStack, Image, Button, HStack, Avatar, Menu, Portal, Link } from '@chakra-ui/react';
 import { useColorModeValue } from '../ui/color-mode';
 import { NavItem, sideBar } from 'renderer/data/textData';
 import { TransitionLink } from '../ui/TransitionLink';
 import { useLoading } from 'renderer/contexts/LoadingContext';
+import { useAuth } from 'renderer/contexts/AuthContext';
 
 export function SideMenu() {
     const { mainNavItems, supportNavItems } = sideBar;
     const [activeItem, setActiveItem] = useState(mainNavItems[0].label);
     const { startLoading } = useLoading();
+
+    const { user } = useAuth();
 
     const copyrightColor = useColorModeValue('gray.600', 'gray.600');
 
@@ -39,8 +42,9 @@ export function SideMenu() {
             zIndex="sticky"
             justifyContent={{ base: 'space-around', md: 'center' }}
             alignItems={'center'}
-            // AJUSTE: Bordas arredondadas apenas para a versão desktop (lateral)
-            // borderRadius={{ base: 0, md: '0 20px 20px 0' }}
+            gap={{ base: 0, md: 6 }}
+        // AJUSTE: Bordas arredondadas apenas para a versão desktop (lateral)
+        // borderRadius={{ base: 0, md: '0 20px 20px 0' }}
         >
             {/* Seção do Logo - Visível apenas em Desktop */}
             <Flex
@@ -99,19 +103,35 @@ export function SideMenu() {
                 ))}
             </VStack>
 
-            {/* Botão de Sair - Visível apenas em Desktop */}
-            <Flex py={2} display={{ base: 'none', md: 'flex' }}>
-                <Button onClick={handleLogout} bgColor={'transparent'} border={'1px solid white'} color={'white'} _hover={{ bgColor: 'brand.600', borderColor: 'transparent' }} size='xs' px={12}>
-                    Sair
-                </Button>
-            </Flex>
-
             {/* Copyright - Visível apenas em Desktop */}
             <Flex display={{ base: 'none', md: 'flex' }}>
                 <Text fontSize="xs" color={copyrightColor}>
                     ©2025 AWER LLC.
                 </Text>
             </Flex>
+            {/* Seção de Usuário */}
+            <Flex flexDir={'column'} alignItems={'center'} justifyContent={'center'} p={2} borderRadius={8} bgColor={'transparent'} gap={4}>
+                <Flex w='100%' h='0.5px' bgColor={'whiteAlpha.300'} />
+                <Link href={'https://www.awer.co/minha-conta'} target='_blank' textDecor={'none'} >
+                    <Flex gap={3} alignItems={'center'} w='100%'>
+                        <Avatar.Root size={'sm'} border={'2px solid'} borderColor={'brand.500'}>
+                            <Avatar.Fallback name={user?.name} />
+                            <Avatar.Image src={user?.picture} />
+                        </Avatar.Root>
+                        <Text fontSize='xs' display={{ base: 'none', md: 'block' }} color={'gray.200'}>Olá, {user?.name}!</Text>
+                    </Flex>
+                </Link>
+
+                {/* <Flex w='100%' h='0.5px' bgColor={'whiteAlpha.300'} /> */}
+
+                {/* Botão de Sair - Visível apenas em Desktop */}
+                <Flex display={{ base: 'none', md: 'flex' }} w='100%'>
+                    <Button onClick={handleLogout} bgColor={'transparent'} border={'1px solid'} borderColor={'whiteAlpha.300'} color={'white'} _hover={{ bgColor: 'brand.600', borderColor: 'transparent' }} size='xs' w='100%'>
+                        Sair
+                    </Button>
+                </Flex>
+            </Flex>
+
         </Flex>
     );
 }
