@@ -8,6 +8,11 @@ const config = defineConfig({
     theme: {
         tokens: {
             colors: {
+                whatsapp: { value: "#25D366" }, // Cor do WhatsApp
+                instagram: { value: "#E4405F" }, // Cor do Instagram
+                facebook: { value: "#1877F2" }, // Cor do Facebook
+                twitter: { value: "#1DA1F2" }, // Cor do Twitter
+                linkedin: { value: "#0077B5" }, // Cor do LinkedIn
                 fullBlack: { value: "#000000" },
                 black: { value: "#1A202C" }, // Preto padrão Chakra (quase preto)
                 white: { value: "#FFFFFF" },

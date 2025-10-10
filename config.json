@@ -1,6 +1,6 @@
 {
   "auth0": {
-    "domain": "dev-pzivs8swerlhnydf.us.auth0.com",
+    "domain": "auth.awer.co",
     "clientId": "xWxVdNhe14NRbjACn1cCrbEZpDt12Gh8",
     "audience": "https://auth.awer.co"
   },

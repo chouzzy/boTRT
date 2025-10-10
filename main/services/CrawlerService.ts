@@ -1,4 +1,4 @@
-import PCR from "puppeteer-chromium-resolver";
+const PCR = require("puppeteer-chromium-resolver");
 // app/services/CrawlerService.ts
 import { BrowserWindow, dialog } from 'electron';
 import exceljs from 'exceljs';
@@ -31,7 +31,7 @@ export async function initializeCrawlerService(): Promise<CrawlerResponse> {
 let lastScrapedData: any[][] | null = null; // Use um tipo mais específico se possível
 let lastOperationType: string | null = null;
 
-export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath: Buffer<ArrayBufferLike>, operationType: string) {
+export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath: exceljs.Buffer, operationType: string) {
     mainWindow.webContents.send('is-loading', true);
     mainWindow.webContents.send('progress-messages', { message: `Lendo planilha: ${excelPath}...` });
 
@@ -88,7 +88,7 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
             const row = worksheet.getRow(rowNumber);
             console.log('2')
 
-            const trtCell = row.values[1];
+            const trtCell = (row.values as any[])[1];
             if (!trtCell || String(trtCell).trim() === "") {
                 console.log(`Linha ${rowNumber} considerada vazia (sem TRT). Parando leitura da planilha.`);
                 break; // Interrompe o loop for
@@ -365,7 +365,7 @@ function addDataToWorksheet(worksheet: exceljs.Worksheet, data: excelDataIdentif
 
 export async function writeMassiveData(
     listOfAllExcelData: excelDataIdentified[][], // Mantém a estrutura original se ela faz sentido
-    filePath, // Caminho COMPLETO do arquivo, incluindo nome.xlsx
+    filePath:string, // Caminho COMPLETO do arquivo, incluindo nome.xlsx
 ) {
     const workbook = new exceljs.Workbook();
     let hasData = false;

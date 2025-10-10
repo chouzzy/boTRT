@@ -67,38 +67,47 @@ function InvalidLicenseScreen({ onRecheckLicense, isRechecking }: InvalidLicense
     return (
         <Flex w="100vw" h="100vh" justify="center" align="center" bg="blue.950" color="white" p={4} borderRadius={40}>
             <VStack gap={6} p={10} bg="gray.700" borderRadius="lg" boxShadow="lg" position="relative">
-                <Icon as={PiSmileyXEyesLight} boxSize={16} color="brand.500" />
-                <Heading size="lg">Assinatura Não Encontrada</Heading>
-                <Text textAlign="center" maxW="md">
-                    Se você acabou de assinar, aguarde um momento enquanto validamos seu plano. O aplicativo verificará novamente em alguns segundos.
-                </Text>
-                <HStack gap={4} w="100%" justify="center" pt={4}>
-                    <Button
-                        variant="outline"
-                        bgColor={'brand.500'}
-                        _hover={{ bgColor: 'brand.600' }}
-                        onClick={() => {
-                            window.ipc.openExternal('https://www.awer.co/tecnologia/botrt');
-                        }}
-                    >
-                        Ver Planos
-                    </Button>
-                </HStack>
-                
-                <Flex
-                    position="absolute"
-                    bottom={4}
-                    right={4}
-                    align="center"
-                    gap={2}
-                    color="gray.400"
-                    fontSize="xs"
+            <Icon as={PiSmileyXEyesLight} boxSize={16} color="brand.500" />
+            <Heading size="lg">Assinatura Não Encontrada</Heading>
+            <Text textAlign="center" maxW="md">
+                Se você acabou de assinar, aguarde um momento enquanto validamos seu plano. O aplicativo verificará novamente em alguns segundos.
+            </Text>
+            <HStack gap={4} w="100%" justify="center" pt={4}>
+                <Button
+                variant="outline"
+                bgColor={'brand.500'}
+                _hover={{ bgColor: 'brand.600' }}
+                onClick={() => {
+                    window.ipc.openExternal('https://www.awer.co/tecnologia/botrt');
+                }}
                 >
-                    <Spinner size="xs" opacity={isRechecking ? 1 : 0} />
-                    <Text>
-                        {isRechecking ? 'Verificando...' : `Próxima verificação em ${countdown}s`}
-                    </Text>
-                </Flex>
+                Ver Planos
+                </Button>
+                <Button
+                variant="outline"
+                bgColor={'blue.600'}
+                onClick={() => {
+                    window.ipc.logout();
+                }}
+                >
+                Sair
+                </Button>
+            </HStack>
+            
+            <Flex
+                position="absolute"
+                bottom={4}
+                right={4}
+                align="center"
+                gap={2}
+                color="gray.400"
+                fontSize="xs"
+            >
+                <Spinner size="xs" opacity={isRechecking ? 1 : 0} />
+                <Text>
+                {isRechecking ? 'Verificando...' : `Próxima verificação em ${countdown}s`}
+                </Text>
+            </Flex>
             </VStack>
         </Flex>
     );
@@ -140,7 +149,7 @@ export function AuthenticationGuard({ children }: { children: React.ReactNode })
                 
                 if (response.ok) {
                     console.log("[GUARD] Licença verificada:", responsejson);
-                    if (responsejson.status === 'active') {
+                    if (responsejson.status === 'active' || responsejson.status === 'trialing') {
                         setIsLicenseValid(true);
                     } else {
                         setIsLicenseValid(false);

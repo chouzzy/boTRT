@@ -8,8 +8,8 @@ interface SearchTitleProps {
 }
 export function SearchTitle({ title }: SearchTitleProps) {
     return (
-        <Fieldset.Legend w='100%' mb={16}>
-            <CustomText text={title} textAlign='center' fontSize={'5xl'} fontWeight={'semibold'} textTransform={'uppercase'} pl={1} />
+        <Fieldset.Legend w='100%' mb={4}>
+            <CustomText text={title} textAlign='center' fontSize={'3xl'} fontWeight={'semibold'} textTransform={'uppercase'} pl={1} />
         </Fieldset.Legend>
     );
 }

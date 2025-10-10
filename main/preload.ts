@@ -70,6 +70,9 @@ const handler = {
     // --- GERENCIAMENTO DE SESSÃO ---
     // Renderer -> Main: Pergunta se o usuário está autenticado (ao iniciar o app).
     isAuthenticated: (): Promise<boolean> => ipcRenderer.invoke('auth:is-authenticated'),
+    
+    // Renderer -> Main: Pede os dados do perfil do usuário.
+    getUserProfile: () => ipcRenderer.invoke('auth:get-user-profile'),
 
     // Renderer -> Main: Pede o token de acesso para fazer chamadas de API.
     getAccessToken: (): Promise<string | null> => ipcRenderer.invoke('auth:get-access-token'),
@@ -78,6 +81,9 @@ const handler = {
     logout: (): void => ipcRenderer.send('auth:logout'),
 
     openExternal: (url: string) => ipcRenderer.send('open-external-link', url),
+
+    scrapeCeat: (cnpj: string) => ipcRenderer.send('scrape-ceat', { cnpj }),
+
 
     // No seu handler do preload.js
     processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string }) =>

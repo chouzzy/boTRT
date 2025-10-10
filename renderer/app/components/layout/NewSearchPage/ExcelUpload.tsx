@@ -25,12 +25,12 @@ export function ExcelUpload({ register, inputLabel, inputDescription, downloadBu
     };
     
     return (
-        <FileUpload.Root maxW="sm" alignItems="stretch" maxFiles={1} gap={8}>
+        <FileUpload.Root maxW="100%" alignItems="stretch" maxFiles={1} gap={4}>
             <Fieldset.Legend>
                 <CustomText text={inputLabel} fontWeight={'light'} fontSize={'sm'} textTransform={'uppercase'} pl={1} w='100%' />
             </Fieldset.Legend>
             <Fieldset.Legend>
-                <MotionButton variants={buttonVariants} initial='initial' whileHover='hover' whileTap="tap" bgColor={'transparent'} border='2px solid' color={'ghostWhite'} borderColor={'ghostWhite'} px={16} textTransform={'uppercase'}>
+                <MotionButton variants={buttonVariants} initial='initial' whileHover='hover' whileTap="tap" bgColor={'transparent'} border='1px solid' color={'ghostWhite'} borderColor={'ghostWhite'} w='100%' textTransform={'uppercase'}>
                     <Link href={downloadLink} style={{ textDecoration: 'none', color: 'inherit' }} target='_blank'>
                         <Flex gap={2} alignItems={'center'}>
                             <PiDownloadSimpleFill />
