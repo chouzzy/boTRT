@@ -3,6 +3,7 @@ import { PuppeteerCallback, ScrapeData, credentials, dateSelected } from "../../
 import { consumeMinhaPautaApi } from "./consumeMinhaPautaApi";
 
 async function scrapeMinhaPauta(
+    chaveSecretaMFA: string,
     painel: ScrapeData["painel"],
     dateSelected: dateSelected,
     credentials: credentials,
@@ -19,7 +20,7 @@ async function scrapeMinhaPauta(
 
     try {
         console.log('Inside scrapeMinhaPauta')
-        apiResponse = await consumeMinhaPautaApi(painel, dateSelected, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
+        apiResponse = await consumeMinhaPautaApi(chaveSecretaMFA, painel, dateSelected, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
             return listOfExcelData
@@ -27,7 +28,7 @@ async function scrapeMinhaPauta(
 
         listOfExcelData.push(apiResponse)
 
-        apiResponse = await consumeMinhaPautaApi(painel, dateSelected, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
+        apiResponse = await consumeMinhaPautaApi(chaveSecretaMFA, painel, dateSelected, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
             return listOfExcelData

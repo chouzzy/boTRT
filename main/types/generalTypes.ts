@@ -43,6 +43,7 @@ import * as exceljs from 'exceljs';
 export interface importDataProps {
   fileBuffer: exceljs.Buffer
   operationType: string
+  chaveSecretaMFA: string
 }
 
 export interface scrapeDataListProps {
@@ -50,6 +51,7 @@ export interface scrapeDataListProps {
   trtNumber: number
   username: credentials["user"]
   password: credentials["password"]
+  chaveSecretaMFA: string
   date: {
     initial: {
       day: string;

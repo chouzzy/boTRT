@@ -5,6 +5,7 @@ import { ConsumeAcervoGeralApi } from "./consumeAcervoGeralApi";
 import { filtrarPorData } from "./dateFilter";
 
 async function scrapeAcervoGeral(
+    chaveSecretaMFA: string,
     painel: ScrapeData["painel"],
     credentials: credentials,
     trt: number,
@@ -21,7 +22,7 @@ async function scrapeAcervoGeral(
     try {
 
 
-        apiResponse = await ConsumeAcervoGeralApi(painel, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
+        apiResponse = await ConsumeAcervoGeralApi(chaveSecretaMFA, painel, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
             return listOfExcelData
@@ -38,7 +39,7 @@ async function scrapeAcervoGeral(
 
 
         // apiResponse = await ConsumeProcessosArquivadosApi(painel, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
-        apiResponse = await ConsumeAcervoGeralApi(painel, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
+        apiResponse = await ConsumeAcervoGeralApi(chaveSecretaMFA, painel, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
             return listOfExcelData

@@ -70,7 +70,7 @@ const handler = {
     // --- GERENCIAMENTO DE SESSÃO ---
     // Renderer -> Main: Pergunta se o usuário está autenticado (ao iniciar o app).
     isAuthenticated: (): Promise<boolean> => ipcRenderer.invoke('auth:is-authenticated'),
-    
+
     // Renderer -> Main: Pede os dados do perfil do usuário.
     getUserProfile: () => ipcRenderer.invoke('auth:get-user-profile'),
 
@@ -80,13 +80,27 @@ const handler = {
     // Renderer -> Main: Pede para fazer logout.
     logout: (): void => ipcRenderer.send('auth:logout'),
 
+
+    // 1. Frontend "escuta" o pedido do backend para abrir o modal
+    onMfaRequest: (callback: () => void) =>
+        baseOn('mfa:request-code', callback),
+
+    // 2. Frontend "envia" o código digitado pelo usuário para o backend
+    submitMfaCode: (code: string): void =>
+        ipcRenderer.send('mfa:submit-code', code),
+
     openExternal: (url: string) => ipcRenderer.send('open-external-link', url),
 
-    scrapeCeat: (cnpj: string) => ipcRenderer.send('scrape-ceat', { cnpj }),
+    scrapeCeat: (cnpj: string): Promise<{ success: boolean, data?: any[], error?: string }> =>
+        ipcRenderer.invoke('scrape-ceat', cnpj),
+
+    testMfaLogin: (credentials: {user: string, password: string, secretKey: string}) => ipcRenderer.invoke('test-mfa-login', credentials),
+
+    setupMfaAuto: (credentials: {user: string, pass: string}) => ipcRenderer.invoke('setup-mfa-auto', credentials),
 
 
     // No seu handler do preload.js
-    processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string }) =>
+    processUploadedExcel: (data: { fileBuffer: Buffer, fileName: string, operationType: string, mfaCode: string }) =>
         ipcRenderer.send('process-excel-file', data),
 
     window: {

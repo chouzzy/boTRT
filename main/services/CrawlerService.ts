@@ -78,7 +78,6 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
         console.log(`Cabeçalhos OK para ${operationType}`);
 
         // Ler dados das linhas
-        // Usar um loop for tradicional para poder usar await dentro dele corretamente
         console.log(`worksheet.rowCount ${worksheet.rowCount}`)
         let actualRowCountWithData = 0;
 
@@ -109,6 +108,8 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
             // @ts-ignore
             const password = (JSON.stringify(row.values[5])).replace(/"/g, '');
             console.log('7')
+            // @ts-ignore
+            const chaveSecretaMFA = row.values[6];
 
             // Validação básica (ex: verificar se trt, username, password existem)
             if (!trt || !username || !password || !initialDateRaw || !finalDateRaw) {
@@ -125,6 +126,7 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
                 trtNumber: trtDict[trt],
                 username,
                 password,
+                chaveSecretaMFA,
                 date: {
                     initial: {
                         day: new Date(initialDate).getDate().toString().padStart(2, '0'),
@@ -147,18 +149,18 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
         let processedItems = 0;
 
         for (const scrapeParams of scrapeDataList) {
-            const { trtNumber, date, username, password } = scrapeParams;
+            const { trtNumber, date, username, password, chaveSecretaMFA } = scrapeParams;
             let currentScrapedData: excelDataIdentified[] | apiResponseArquivadosProps[] | apiResponseAcervoGeralProps[] = [];
             mainWindow.webContents.send('progress-messages', { message: `Buscando TRT: ${scrapeParams.trt}, Usuário: ${username}` });
             switch (operationType) {
                 case "Minha pauta":
-                    (currentScrapedData as excelDataIdentified[]) = await scrapeMinhaPauta(operationType, date, { user: username, password }, trtNumber, startPuppeteer, mainWindow);
+                    (currentScrapedData as excelDataIdentified[]) = await scrapeMinhaPauta(chaveSecretaMFA, operationType, date, { user: username, password }, trtNumber, startPuppeteer, mainWindow);
                     break;
                 case "Processos arquivados":
-                    (currentScrapedData as apiResponseArquivadosProps[]) = await scrapeArquivados(operationType, { user: username, password }, trtNumber, startPuppeteer, mainWindow, date);
+                    (currentScrapedData as apiResponseArquivadosProps[]) = await scrapeArquivados(chaveSecretaMFA, operationType, { user: username, password }, trtNumber, startPuppeteer, mainWindow, date);
                     break;
                 case "Acervo geral":
-                    (currentScrapedData as apiResponseAcervoGeralProps[]) = await scrapeAcervoGeral(operationType, { user: username, password }, trtNumber, startPuppeteer, mainWindow, date);
+                    (currentScrapedData as apiResponseAcervoGeralProps[]) = await scrapeAcervoGeral(chaveSecretaMFA, operationType, { user: username, password }, trtNumber, startPuppeteer, mainWindow, date);
                     break;
                 default:
                     console.warn("Tipo de operação desconhecido no loop de scrape:", operationType);
@@ -201,13 +203,13 @@ export async function MainBostService(mainWindow: BrowserWindow, scrapeData: Scr
 
         switch (painel) {
             case "Minha pauta":
-                processedData = await scrapeMinhaPauta(painel, date, credentials, trtNumber, startPuppeteer, mainWindow);
+                processedData = await scrapeMinhaPauta('', painel, date, credentials, trtNumber, startPuppeteer, mainWindow);
                 break;
             case "Processos arquivados":
-                processedData = await scrapeArquivados(painel, credentials, trtNumber, startPuppeteer, mainWindow, date);
+                processedData = await scrapeArquivados('', painel, credentials, trtNumber, startPuppeteer, mainWindow, date);
                 break;
             case "Acervo geral":
-                processedData = await scrapeAcervoGeral(painel, credentials, trtNumber, startPuppeteer, mainWindow, date);
+                processedData = await scrapeAcervoGeral('', painel, credentials, trtNumber, startPuppeteer, mainWindow, date);
                 break;
             default:
                 throw new Error(`Tipo de painel desconhecido: ${painel}`);
@@ -271,8 +273,6 @@ export async function handleSaveExcel(mainWindow: BrowserWindow): Promise<{ succ
         return { success: false, error: error.message };
     }
 }
-
-
 
 
 // Função auxiliar para adicionar dados a uma worksheet
@@ -365,7 +365,7 @@ function addDataToWorksheet(worksheet: exceljs.Worksheet, data: excelDataIdentif
 
 export async function writeMassiveData(
     listOfAllExcelData: excelDataIdentified[][], // Mantém a estrutura original se ela faz sentido
-    filePath:string, // Caminho COMPLETO do arquivo, incluindo nome.xlsx
+    filePath: string, // Caminho COMPLETO do arquivo, incluindo nome.xlsx
 ) {
     const workbook = new exceljs.Workbook();
     let hasData = false;

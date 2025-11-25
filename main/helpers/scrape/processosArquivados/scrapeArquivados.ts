@@ -4,6 +4,7 @@ import { ConsumeProcessosArquivadosApi } from "./consumeProcessosArquivadosApi";
 import { filtrarPorData } from "./dateFilter";
 
 async function scrapeArquivados(
+    chaveSecretaMFA: string,
     painel: ScrapeData["painel"],
     credentials: credentials,
     trt: number,
@@ -20,7 +21,7 @@ async function scrapeArquivados(
     try {
 
 
-        apiResponse = await ConsumeProcessosArquivadosApi(painel, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
+        apiResponse = await ConsumeProcessosArquivadosApi(chaveSecretaMFA, painel, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
             return listOfExcelData
