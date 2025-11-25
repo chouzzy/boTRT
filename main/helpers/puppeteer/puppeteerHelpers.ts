@@ -30,7 +30,7 @@ export async function startPuppeteer(headless: boolean): Promise<PuppeteerResult
          headless: false,
          args: [
             // "--no-sandbox",
-            `--window-size=${920},${920}`,
+            `--window-size=${1920},${1080}`,
          ],
          // executablePath: stats.executablePath
          executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe" 
@@ -42,8 +42,8 @@ export async function startPuppeteer(headless: boolean): Promise<PuppeteerResult
 
       const page = await browser.newPage();
       await page.setViewport({
-         width: 720,
-         height: 920,
+         width: 1920,
+         height: 1080,
       });
 
       console.log('tudo ok com o pupa')

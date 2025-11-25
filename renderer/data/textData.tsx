@@ -1,7 +1,7 @@
 import { createListCollection, Flex, Highlight, Text } from "@chakra-ui/react";
 import { select } from "framer-motion/client";
 import { JSX } from "react";
-import { PiArchiveBold, PiBookBold, PiDownloadFill, PiGearBold, PiHouseBold, PiKeyboardBold, PiKeyBold, PiLink, PiMagnifyingGlassBold, PiMagnifyingGlassFill, PiNumberCircleOne, PiNumberCircleOneFill, PiNumberCircleTwoFill, PiPhoneBold, PiShareFat, PiShareFatFill } from "react-icons/pi";
+import { PiArchiveBold, PiBookBold, PiDownloadFill, PiGearBold, PiHouseBold, PiKeyboardBold, PiKeyBold, PiLink, PiMagnifyingGlassBold, PiMagnifyingGlassFill, PiNumberCircleOne, PiNumberCircleOneFill, PiNumberCircleTwoFill, PiPhoneBold, PiShareFat, PiShareFatFill, PiTestTube } from "react-icons/pi";
 
 export const homePage = {
     title: <Flex>Bem-vindo ao</Flex>,
@@ -66,7 +66,7 @@ export interface NavItem {
 const mainNavItems: NavItem[] = [
     { label: 'Página inicial', href: '/', icon: <PiHouseBold size={24} /> },
     { label: 'Nova Busca', href: '/NewSearch', icon: <PiMagnifyingGlassBold size={24} /> },
-    // { label: 'CEAT', href: '/Ceat', icon: <PiMagnifyingGlassBold size={24} /> },
+    { label: 'MFA', href: '/TestMFA', icon: <PiTestTube size={24} /> },
     { label: 'Histórico de Buscas', href: '/SearchHistory', icon: <PiBookBold size={24} /> },
     { label: 'Buscas Agendadas', href: '/ScheduleSearch', icon: <PiArchiveBold size={24} /> },
     // { label: 'Configurações', href: '/SettingsPage', icon: <PiGearBold size={24} /> },

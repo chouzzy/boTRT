@@ -62,7 +62,7 @@ if (isProd) {
     resizable: true,
     closable: true,
     height: 800,
-    width: 1280,
+    width: 1480,
     center: true,
     frame: false,
     titleBarStyle: 'hidden',

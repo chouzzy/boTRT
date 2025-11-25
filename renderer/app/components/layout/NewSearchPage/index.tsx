@@ -5,7 +5,7 @@ import { motion, Variants } from 'framer-motion';
 import { useForm } from "react-hook-form";
 
 // Chakra UI & Icons
-import { Button, Fieldset, Flex, VStack, Stack } from '@chakra-ui/react'; // Adicionado Stack e StackDivider
+import { Button, Fieldset, Flex, VStack, Stack, Field, Input, Dialog, Portal } from '@chakra-ui/react'; // Adicionado Stack e StackDivider
 import { PiFloppyDiskFill, PiPlayFill } from 'react-icons/pi';
 
 // Contexts, Data, e Componentes Customizados
@@ -21,6 +21,21 @@ export function NewSearch() {
     const [isProcessFinished, setIsProcessFinished] = useState(false);
     const [isProcessStarted, setIsProcessStarted] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Estados para o modal de MFA
+    const [isMfaModalOpen, setIsMfaModalOpen] = useState(false);
+    const [mfaCode, setMfaCode] = useState('');
+
+    // NOVO USEEFFECT: Escuta o pedido de MFA vindo do backend
+    useEffect(() => {
+        const unsubscribe = window.ipc.onMfaRequest(() => {
+            console.log('[Frontend] Backend solicitou código MFA. Abrindo modal...');
+            setMfaCode(''); // Limpa o código anterior
+            setIsMfaModalOpen(true); // Abre o modal
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     // Efeito para ouvir o fim do processo de scrape
     useEffect(() => {
@@ -95,7 +110,7 @@ export function NewSearch() {
         setLogMessages([]);
         setIsProcessFinished(false);
         setIsProcessStarted(true);
-        const { operacao, planilha } = data;
+        const { operacao, planilha, mfacode } = data;
 
         if (!planilha || planilha.length === 0) {
             setError('planilha', { type: 'manual', message: 'É necessário fazer o upload de uma planilha.' });
@@ -110,7 +125,8 @@ export function NewSearch() {
             await window.ipc.processUploadedExcel({
                 fileBuffer: fileBuffer,
                 fileName: primeiroArquivo.name,
-                operationType: operacao
+                operationType: operacao,
+                mfaCode: mfacode || '',
             });
         } catch (error) {
             console.error("Erro ao ler ou processar o arquivo:", error);
@@ -146,22 +162,38 @@ export function NewSearch() {
         }
     };
 
+
+    // Função chamada quando o usuário envia o código do modal
+    const handleMfaSubmit = () => {
+        if (mfaCode.length === 6) {
+            window.ipc.submitMfaCode(mfaCode);
+            setIsMfaModalOpen(false);
+        } else {
+            toaster.create({
+                title: "Código Inválido",
+                description: "O código MFA deve ter 6 dígitos.",
+                type: 'warning'
+            });
+        }
+    };
+
     return (
         <Flex
             flexDir={'column'}
+            color={'textPrimary'}
             w='100%'
             minH='100vh' // AJUSTE: minH é mais seguro
             bg={'transparent'}
             justifyContent={'center'}
             alignItems='center'
             bgColor={'cardBg'}
-            // AJUSTE: Padding na página para evitar que o card encoste nas bordas em telas pequenas
+        // AJUSTE: Padding na página para evitar que o card encoste nas bordas em telas pequenas
         >
             <MotionFlex
-                variants={HomeVariants}
-                initial='initial'
+                // variants={HomeVariants}
+                // initial='initial'
                 bgColor={'cardBg'}
-                animate='visible'
+                // animate='visible'
                 flexDir={'column'}
                 // AJUSTE: Largura corrigida e responsiva
                 w='100%'
@@ -184,6 +216,7 @@ export function NewSearch() {
                                 <SearchTitle title={title} />
                                 <Fieldset.Content>
                                     <VStack gap={6} align="stretch">
+
                                         <OperationSelect
                                             control={control}
                                             errors={errors}
@@ -241,15 +274,70 @@ export function NewSearch() {
                     </Flex>
                     <Flex borderLeft={'1px solid'} borderColor={'whiteAlpha.300'} h='auto' />
                     {/* Coluna do Painel de Descrição/Logs */}
-                    <Flex flex={1.5}> {/* Faz esta coluna ser um pouco maior */}
+                    <Flex flex={1.5}  flexDir={'column'}> {/* Faz esta coluna ser um pouco maior */}
                         <DescriptionPanel
                             description={newSearch.description}
                             logMessages={logMessages}
                             isProcessFinished={isProcessFinished}
                             isProcessStarted={isProcessStarted} />
+
+                        <Flex flexDir={'column'}>
+                            <Field.Root invalid={!!errors.mfacode}>
+                                <Field.Label>Por favor, insira o código MFA de 6 dígitos:</Field.Label>
+                                <Input
+                                    placeholder="000000"
+                                    maxLength={6}
+                                    value={mfaCode}
+                                    onChange={(e) => setMfaCode(e.target.value)}
+                                    autoFocus
+                                    maxW={40}
+                                />
+                                <Field.ErrorText>{errors.mfacode?.message}</Field.ErrorText>
+                                <Button colorPalette="blue" onClick={handleMfaSubmit} disabled={mfaCode.length < 6}>
+                                    Enviar Código
+                                </Button>
+                            </Field.Root>
+                        </Flex>
                     </Flex>
                 </Stack>
             </MotionFlex>
+
+            {/* ✨ 2. MODAL SUBSTITUÍDO POR DIALOG (CHAKRA V3 / ARK UI) ✨ */}
+            {/* <Dialog.Root
+                lazyMount
+                open={isMfaModalOpen}
+                onOpenChange={(e) => setIsMfaModalOpen(e.open)}
+                closeOnInteractOutside={false} // Equivalente a closeOnOverlayClick={false}
+            >
+                <Portal>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
+                        <Dialog.Content bg="gray.800" color="white" maxW="md">
+                            <Dialog.Header>
+                                <Dialog.Title>Autenticação Necessária</Dialog.Title>
+                            </Dialog.Header>
+                            <Dialog.Body>
+                                <Field.Root invalid={!!errors.mfacode}>
+                                    <Field.Label>Por favor, insira o código MFA de 6 dígitos:</Field.Label>
+                                    <Input
+                                        placeholder="000000"
+                                        maxLength={6}
+                                        value={mfaCode}
+                                        onChange={(e) => setMfaCode(e.target.value)}
+                                        autoFocus
+                                    />
+                                    <Field.ErrorText>{errors.mfacode?.message}</Field.ErrorText>
+                                </Field.Root>
+                            </Dialog.Body>
+                            <Dialog.Footer>
+                                <Button colorScheme="blue" onClick={handleMfaSubmit} disabled={mfaCode.length < 6}>
+                                    Enviar Código
+                                </Button>
+                            </Dialog.Footer>
+                        </Dialog.Content>
+                    </Dialog.Positioner>
+                </Portal>
+            </Dialog.Root> */}
         </Flex>
     );
 }

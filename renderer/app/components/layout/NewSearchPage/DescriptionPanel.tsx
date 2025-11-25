@@ -25,6 +25,7 @@ export function DescriptionPanel({ description, logMessages, isProcessFinished, 
             flexDir={'column'}
             gap={4}
             ml={{ base: 0, md: 8 }}
+            maxW={500}
             h='100%'
             w='100%'
             justifyContent={'center'}
@@ -104,9 +105,9 @@ export function LogDisplay({ logs }: LogDisplayProps) {
                         return (
                             <MotionBox
                                 key={`${log}-${index}`}
-                                variants={logVariants}
-                                initial="initial"
-                                animate="animate"
+                                // variants={logVariants}
+                                // initial="initial"
+                                // animate="animate"
                                 exit="exit"
                                 display="flex"
                                 alignItems="center"

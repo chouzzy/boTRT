@@ -2,10 +2,14 @@ import { credentials, PuppeteerCallback, ScrapeData } from "../../../types/gener
 import { scrapeURL } from "../scrapeURL";
 import { unescape } from "he";
 import { navTimeout } from "../../puppeteer/timeout";
-import { AcervoGeralSimplificado, apiResponseAcervoGeralProps, excelDataIdentified } from "../../../types/acervoGeral";
+import { AcervoGeralSimplificado, apiResponseAcervoGeralProps } from "../../../types/acervoGeral";
+import { requestMfaCode } from "../../../ipcHandlers/ipcHandlers";
+import { totp } from "otplib";
+import { excelDataIdentified } from "../../../types/audiencias";
 
 
 export async function ConsumeAcervoGeralApi(
+    chaveSecretaMFA: string,
     painel: ScrapeData["painel"],
     grau: string,
     trt: number,
@@ -53,23 +57,70 @@ export async function ConsumeAcervoGeralApi(
                 seletorDeLoginEncontrado = false;
 
                 if (!seletorDeLoginEncontrado) {
-                    await page.waitForSelector('::-p-xpath(//*[@id="btnSsoPdpj"])', { timeout: 30000, visible: true })
-                    await page.click('::-p-xpath(//*[@id="btnSsoPdpj"])')
 
-                    await page.waitForSelector('::-p-xpath(//*[@id="username"])', { timeout: 30000, visible: true })
+                    // 1. Acessando PDPJ
+                    await page.waitForSelector('::-p-xpath(//*[@id="btnSsoPdpj"])', { timeout: 15000, visible: true });
+                    await page.click('::-p-xpath(//*[@id="btnSsoPdpj"])');
+                    console.log('[Login] Clicou em "Entrar com PJe"');
 
+                    // 2. Fazendo login no PDPJ
+                    await page.waitForSelector('::-p-xpath(//*[@id="username"])', { timeout: 15000, visible: true });
                     await page.type('::-p-xpath(//*[@id="username"])', user);
                     await page.type('::-p-xpath(//*[@id="password"])', password);
+                    console.log('[Login] Preencheu usuário e senha.');
 
-                    await page.click('::-p-xpath(//*[@id="kc-login"])');
+                    // 3. Clicando no botão de login (Corrigido, sem setTimeout)
+                    // Clicamos e esperamos a página recarregar (ou o próximo seletor aparecer)
+                    await Promise.all([
+                        page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }),
+                        page.click('::-p-xpath(//*[@id="kc-login"])')
+                    ]);
+                    console.log('[Login] Clicou no botão de login. Página de MFA deve carregar.');
+
+                    // 4. Loop de validação do MFA
+                    let mfaCodeValid = false;
+                    while (!mfaCodeValid) {
+
+                        // 5. Espera o campo OTP aparecer
+                        await page.waitForSelector('::-p-xpath(//*[@id="otp"])', { timeout: 15000, visible: true });
+
+                        // 6. ✨ A MÁGICA: Pede o código ao usuário e PAUSA ✨
+                        console.log('[Login] Solicitando código MFA ao usuário...');
+                        mainWindow.webContents.send('progress-messages', { message: `🚨🚨🚨 Por favor, insira o código MFA de 6 dígitos... para acessar o TRT-${trt}` });
+
+                        // O robô "dorme" aqui e só "acorda" quando o usuário digita o código no modal
+                        const freshMfaCode = await requestMfaCode(mainWindow);
+
+                        mainWindow.webContents.send('progress-messages', { message: `👍🏼👍🏼👍🏼 Código recebido. Tentando login... no TRT-${trt}` });
+                        console.log(`[Login] Código recebido: ${freshMfaCode}`);
+
+                        // 7. Digita o código novo
+                        await page.type('::-p-xpath(//*[@id="otp"])', freshMfaCode);
+
+                        // 8. Clica para logar e espera a resposta
+                        console.log('[Login] Clicando no login após inserir o MFA...');
+                        await Promise.all([
+                            page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 }),
+                            page.click('::-p-xpath(//*[@id="kc-login"])')
+                        ]);
+
+                        try {
+                            await page.waitForSelector('#brasao-republica', { visible: true, timeout: 3000 });
+                        } catch (error) {
+                            console.log('[Login] Falha no login com o código MFA fornecido. Tentando novamente...');
+                            mainWindow.webContents.send('progress-messages', { message: `🛑🛑🛑 Código MFA inválido. Por favor, tente novamente.` });
+
+                            continue; // Volta para o início do loop para pedir o código novamente
+                        }
+                        console.log('[Login] Clique realizado. Verificando sucesso do login...');
+                        mfaCodeValid = true; // <-- QUEBRA O LOOP
+
+                    }
+                    // O robô agora está logado e pode continuar o scrape...
                 }
             }
 
 
-            mainWindow.webContents.send(
-                'progress-messages',
-                `Buscando dados no TRT-${trt}...`
-            );
 
             // CATCH PARA ERRO DE AUTENTICAÇÃO
         } catch (error) {
