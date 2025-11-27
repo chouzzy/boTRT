@@ -21,7 +21,7 @@ async function scrapeAcervoGeral(
 
     try {
 
-
+        mainWindow.webContents.send('progress-messages', { message: `Iniciando busca no acervo geral para TRT-${trt}, primeiro grau...` });
         apiResponse = await ConsumeAcervoGeralApi(chaveSecretaMFA, painel, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
@@ -38,7 +38,7 @@ async function scrapeAcervoGeral(
 
 
 
-        // apiResponse = await ConsumeProcessosArquivadosApi(painel, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
+        mainWindow.webContents.send('progress-messages', { message: `Iniciando busca no acervo geral para TRT-${trt}, segundo grau...` });
         apiResponse = await ConsumeAcervoGeralApi(chaveSecretaMFA, painel, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
