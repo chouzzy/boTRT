@@ -32,14 +32,14 @@ export function DescriptionPanel({ description, logMessages, isProcessFinished, 
             alignItems={'center'}
         >
             {/* Mostra os logs enquanto o processo está rodando */}
-            {isProcessStarted && !isProcessFinished && (
-                <LogDisplay logs={logMessages} />
-            )}
+            <LogDisplay logs={logMessages} />
+            {/* {isProcessStarted && !isProcessFinished && (
+            )} */}
             
             {/* Mostra a descrição final quando o processo termina */}
-            {isProcessFinished && (
+            {/* {isProcessFinished && (
                 <CustomText text={description} fontWeight={'light'} fontSize={'xl'} textAlign="center" />
-            )}
+            )} */}
         </Flex>
     );
 }
@@ -88,13 +88,14 @@ export function LogDisplay({ logs }: LogDisplayProps) {
             <VStack
                 ref={logsContainerRef}
                 w="full"
-                h="250px"
+                h={'100%'}
                 bg="blackAlpha.300"
                 borderRadius="md"
                 p={4}
                 align="flex-start"
                 overflowY="auto"
                 gap={2}
+                maxH={500}
             >
                 <AnimatePresence>
                     {logs.map((log, index) => {
@@ -112,9 +113,10 @@ export function LogDisplay({ logs }: LogDisplayProps) {
                                 display="flex"
                                 alignItems="center"
                                 width="100%"
+                                
                             >
                                 {/* Lógica de Ícone Condicional */}
-                                {isLast ? (
+                                {isLast && (log != 'Arquivo salvo com sucesso!') && (!log.startsWith('Busca finalizada!')) && (!log.startsWith('⚠️⚠️⚠️ Nenhum processo encontrado')) ? (
                                     // Se for o último log, mostra o spinner
                                     <Icon as={PiCircleNotch} color="green.300" mr={2} className="animate-spin" />
                                 ) : (

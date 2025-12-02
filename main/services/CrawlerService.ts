@@ -33,7 +33,7 @@ let lastOperationType: string | null = null;
 
 export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath: exceljs.Buffer, operationType: string) {
     mainWindow.webContents.send('is-loading', true);
-    mainWindow.webContents.send('progress-messages', { message: `Lendo planilha: ${excelPath}...` });
+    mainWindow.webContents.send('progress-messages', { message: `👓👓👓 Lendo planilha...` });
 
     try {
         const workbook = new exceljs.Workbook();
@@ -150,6 +150,7 @@ export async function MainBostExcelService(mainWindow: BrowserWindow, excelPath:
 
         for (const scrapeParams of scrapeDataList) {
             const { trtNumber, date, username, password, chaveSecretaMFA } = scrapeParams;
+            console.log(`Iniciando scrape para TRT ${scrapeParams.trt}, Usuário: ${username}, Tipo de operação: ${operationType}, password: ${password}, MFA: ${chaveSecretaMFA}`);
             let currentScrapedData: excelDataIdentified[] | apiResponseArquivadosProps[] | apiResponseAcervoGeralProps[] = [];
             mainWindow.webContents.send('progress-messages', { message: `Buscando TRT: ${scrapeParams.trt}, Usuário: ${username}` });
             switch (operationType) {
@@ -260,8 +261,12 @@ export async function handleSaveExcel(mainWindow: BrowserWindow): Promise<{ succ
         // ou ter uma função diferente se lastScrapedData de MainBostService for diferente de MainBostExcelService.
 
         // Se lastScrapedData é sempre [][]excelDataIdentified:
-        await writeMassiveData(lastScrapedData as excelDataIdentified[][], filePath);
+        const hasData = await writeMassiveData(lastScrapedData as excelDataIdentified[][], filePath, mainWindow);
 
+        if (!hasData) {
+            mainWindow.webContents.send('progress-messages', { message: `⚠️⚠️⚠️ Nenhum processo encontrado nas datas filtradas, cancelando salvamento da planilha.` });
+            return { success: false, message: "Nenhum processo encontrado nas datas filtradas, cancelando salvamento da planilha." };
+        }
         mainWindow.webContents.send('progress-messages', { message: `Arquivo salvo com sucesso!` });
         lastScrapedData = null; // Limpa os dados após salvar
         lastOperationType = null;
@@ -354,6 +359,8 @@ function addDataToWorksheet(worksheet: exceljs.Worksheet, data: excelDataIdentif
                 nomeParteRe: item.nomeParteRe, // Ajuste
                 dataAutuacao: moment(item.dataAutuacao).format('DD/MM/YYYY')
             });
+
+            console.log(`Adicionando processo ${item.numeroProcesso} à planilha. Data de autuação: ${item.dataAutuacao}, data formatada: ${moment(item.dataAutuacao).format('DD/MM/YYYY')}`);
         });
     }
     // Adicione um estilo básico ao cabeçalho
@@ -366,6 +373,7 @@ function addDataToWorksheet(worksheet: exceljs.Worksheet, data: excelDataIdentif
 export async function writeMassiveData(
     listOfAllExcelData: excelDataIdentified[][], // Mantém a estrutura original se ela faz sentido
     filePath: string, // Caminho COMPLETO do arquivo, incluindo nome.xlsx
+    mainWindow: Electron.CrossProcessExports.BrowserWindow
 ) {
     const workbook = new exceljs.Workbook();
     let hasData = false;
@@ -408,6 +416,7 @@ export async function writeMassiveData(
 
     if (!hasData) {
         console.log("Nenhum dado válido encontrado em listOfAllExcelData para gerar o arquivo Excel.");
+        mainWindow.webContents.send('progress-messages', { message: `⚠️⚠️⚠️ Nenhum processo encontrado nas datas filtradas, cancelando salvamento da planilha.` });
         return; // Não cria o arquivo se não houver dados
     }
 
@@ -417,7 +426,12 @@ export async function writeMassiveData(
         // Se filePath já é o nome completo do arquivo:
         console.log(`Salvando workbook em: ${filePath}`);
         await workbook.xlsx.writeFile(finalFileName);
-        console.log(`Arquivo Excel consolidado salvo com sucesso em: ${filePath}`);
+        if (!hasData) {
+            return false
+        } else {
+            console.log(`Arquivo Excel consolidado salvo com sucesso em: ${filePath}`);
+            return true
+        }
     } catch (error) {
         console.error('Erro ao salvar o arquivo Excel consolidado:', error);
         throw error; // Re-lança o erro para ser tratado pelo chamador

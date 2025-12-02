@@ -281,7 +281,7 @@ export function NewSearch() {
                             isProcessFinished={isProcessFinished}
                             isProcessStarted={isProcessStarted} />
 
-                        <Flex flexDir={'column'}>
+                        {/* <Flex flexDir={'column'}>
                             <Field.Root invalid={!!errors.mfacode}>
                                 <Field.Label>Por favor, insira o código MFA de 6 dígitos:</Field.Label>
                                 <Input
@@ -297,7 +297,7 @@ export function NewSearch() {
                                     Enviar Código
                                 </Button>
                             </Field.Root>
-                        </Flex>
+                        </Flex> */}
                     </Flex>
                 </Stack>
             </MotionFlex>

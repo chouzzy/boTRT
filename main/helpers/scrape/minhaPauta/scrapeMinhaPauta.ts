@@ -20,6 +20,7 @@ async function scrapeMinhaPauta(
 
     try {
         console.log('Inside scrapeMinhaPauta')
+        mainWindow.webContents.send('progress-messages', { message: `Iniciando busca nos processos da minha pauta para TRT-${trt}, primeiro grau...` });
         apiResponse = await consumeMinhaPautaApi(chaveSecretaMFA, painel, dateSelected, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {
@@ -28,6 +29,7 @@ async function scrapeMinhaPauta(
 
         listOfExcelData.push(apiResponse)
 
+        mainWindow.webContents.send('progress-messages', { message: `Iniciando busca nos processos da minha pauta para TRT-${trt}, segundo grau...` });
         apiResponse = await consumeMinhaPautaApi(chaveSecretaMFA, painel, dateSelected, 'segundograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {

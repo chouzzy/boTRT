@@ -21,6 +21,7 @@ async function scrapeArquivados(
     try {
 
 
+        mainWindow.webContents.send('progress-messages', { message: `Iniciando busca nos processos arquivados para TRT-${trt}, primeiro grau...` });
         apiResponse = await ConsumeProcessosArquivadosApi(chaveSecretaMFA, painel, 'primeirograu', trt, credentials, startPuppeteer, mainWindow)
 
         if (apiResponse.excelData[0].numeroProcesso == "Erro de autenticação") {

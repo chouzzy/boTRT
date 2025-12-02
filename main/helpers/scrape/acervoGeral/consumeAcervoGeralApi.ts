@@ -4,12 +4,13 @@ import { unescape } from "he";
 import { navTimeout } from "../../puppeteer/timeout";
 import { AcervoGeralSimplificado, apiResponseAcervoGeralProps } from "../../../types/acervoGeral";
 import { requestMfaCode } from "../../../ipcHandlers/ipcHandlers";
-import { totp } from "otplib";
+import * as OTPAuth from "otpauth";
+import { extractMfaSecret } from "../../mfa/MfaUtils";
 import { excelDataIdentified } from "../../../types/audiencias";
 
 
 export async function ConsumeAcervoGeralApi(
-    chaveSecretaMFA: string,
+    chaveSecretaMFA_Input: string,
     painel: ScrapeData["painel"],
     grau: string,
     trt: number,
@@ -22,80 +23,109 @@ export async function ConsumeAcervoGeralApi(
 
         const { page, browser } = await startPuppeteer(false)
         let urlInterceptedID = ''
-
+        const chaveSecretaMFA = extractMfaSecret(chaveSecretaMFA_Input);
 
         // Try para navegação e para identificação do tipo de Login e Ação de login
         try {
             // Teste de acesso ao TRT (aqui eliminamos a hipotese de um TRT inexistente)
             try {
-
                 await page.goto(`https://pje.trt${trt}.jus.br/${grau}/login.seam`);
-                // await page.waitForNavigation({timeout:60000})
             } catch (error) {
                 throw error
             } finally {
                 console.log('finally-mp')
             }
 
-            let seletorDeLoginEncontrado = false; // Flag para controlar qual caminho seguir
+            let seletorDeLoginEncontrado = false;
             const { user, password } = credentials
 
             // Testa o tipo do login (aqui identificamos o tipo de login, se é PDPJ ou Padrão)
             try {
                 const seletorDeLogin = await page.waitForSelector('::-p-xpath(//*[@id="username"])', { timeout: 10000, visible: true })
-
                 if (seletorDeLogin) {
                     seletorDeLoginEncontrado = true;
-
                     await page.type('#username', user);
                     await page.type('#password', password);
                     await page.click('#btnEntrar')
                 }
-
-
             } catch (error) {
                 seletorDeLoginEncontrado = false;
+                console.log('[Login] Login padrão não encontrado. Tentando fluxo PDPJ (MFA)...');
 
                 if (!seletorDeLoginEncontrado) {
-
                     // 1. Acessando PDPJ
-                    await page.waitForSelector('::-p-xpath(//*[@id="btnSsoPdpj"])', { timeout: 15000, visible: true });
+                    await page.waitForSelector('::-p-xpath(//*[@id="btnSsoPdpj"])', { timeout: 30000, visible: true });
                     await page.click('::-p-xpath(//*[@id="btnSsoPdpj"])');
                     console.log('[Login] Clicou em "Entrar com PJe"');
 
                     // 2. Fazendo login no PDPJ
-                    await page.waitForSelector('::-p-xpath(//*[@id="username"])', { timeout: 15000, visible: true });
+                    await page.waitForSelector('::-p-xpath(//*[@id="username"])', { timeout: 30000, visible: true });
                     await page.type('::-p-xpath(//*[@id="username"])', user);
                     await page.type('::-p-xpath(//*[@id="password"])', password);
                     console.log('[Login] Preencheu usuário e senha.');
 
-                    // 3. Clicando no botão de login (Corrigido, sem setTimeout)
-                    // Clicamos e esperamos a página recarregar (ou o próximo seletor aparecer)
+                    // 3. Clicando no botão de login
                     await Promise.all([
-                        page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }),
+                        page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 60000 }),
                         page.click('::-p-xpath(//*[@id="kc-login"])')
                     ]);
                     console.log('[Login] Clicou no botão de login. Página de MFA deve carregar.');
 
-                    // 4. Loop de validação do MFA
+                    // 4. Loop de validação do MFA (AUTOMÁTICO)
                     let mfaCodeValid = false;
-                    while (!mfaCodeValid) {
+                    // ✨ Adicionado limite de tentativas para não ficar infinito se a chave estiver errada
+                    let attempts = 0;
+
+                    while (!mfaCodeValid && attempts < 5) {
+                        attempts++;
 
                         // 5. Espera o campo OTP aparecer
-                        await page.waitForSelector('::-p-xpath(//*[@id="otp"])', { timeout: 15000, visible: true });
+                        try {
+                            await page.waitForSelector('::-p-xpath(//*[@id="otp"])', { timeout: 60000, visible: true });
+                        } catch (e) {
+                            // Se não apareceu OTP, pode ser que já logou direto (sessão salva)
+                            console.log('[Login] Campo OTP não apareceu. Verificando se já logou...');
+                            break;
+                        }
 
-                        // 6. ✨ A MÁGICA: Pede o código ao usuário e PAUSA ✨
-                        console.log('[Login] Solicitando código MFA ao usuário...');
-                        mainWindow.webContents.send('progress-messages', { message: `🚨🚨🚨 Por favor, insira o código MFA de 6 dígitos... para acessar o TRT-${trt}` });
+                        // 6. ✨ A MÁGICA: GERAÇÃO AUTOMÁTICA DO CÓDIGO ✨
+                        console.log(`[Login] Gerando código MFA (Tentativa ${attempts})...`);
+                        mainWindow.webContents.send('progress-messages', { message: `Gerando código de acesso para o TRT-${trt}...` });
 
-                        // O robô "dorme" aqui e só "acorda" quando o usuário digita o código no modal
-                        const freshMfaCode = await requestMfaCode(mainWindow);
+                        if (!chaveSecretaMFA) {
+                            // Se não tiver chave, lança erro que será pego pelo catch de autenticação lá embaixo
+                            throw new Error("Chave MFA não encontrada na planilha. Configure o MFA.");
+                        }
 
-                        mainWindow.webContents.send('progress-messages', { message: `👍🏼👍🏼👍🏼 Código recebido. Tentando login... no TRT-${trt}` });
-                        console.log(`[Login] Código recebido: ${freshMfaCode}`);
+                        // Configura o gerador TOTP com 'otpauth'
+                        const totp = new OTPAuth.TOTP({
+                            algorithm: "SHA1",
+                            digits: 6,
+                            period: 30,
+                            secret: OTPAuth.Secret.fromBase32(chaveSecretaMFA)
+                        });
 
-                        // 7. Digita o código novo
-                        await page.type('::-p-xpath(//*[@id="otp"])', freshMfaCode);
+                        // Proteção de Tempo: Espera se o código estiver para vencer (menos de 5s)
+                        const seconds = Math.floor(Date.now() / 1000);
+                        const timeRemaining = 30 - (seconds % 30);
+
+                        if (timeRemaining < 5) {
+                            console.log(`[Login] Código expirando em ${timeRemaining}s. Aguardando próximo...`);
+                            mainWindow.webContents.send('progress-messages', { message: `Sincronizando relógio do código...` });
+                            await new Promise(r => setTimeout(r, (timeRemaining + 1) * 1000));
+                        }
+
+                        const token = totp.generate();
+                        console.log(`[Login] Código gerado: ${token}`);
+
+                        // 7. Digita o código novo (e limpa o campo antes)
+                        await page.evaluate(() => {
+                            const otpInput = document.querySelector('#otp') as HTMLInputElement;
+                            if (otpInput) otpInput.value = '';
+                        });
+                        // Digita devagar para o JS pegar
+                        await page.type('::-p-xpath(//*[@id="otp"])', token, { delay: 100 });
+                        await new Promise(r => setTimeout(r, 500));
 
                         // 8. Clica para logar e espera a resposta
                         console.log('[Login] Clicando no login após inserir o MFA...');
@@ -113,19 +143,30 @@ export async function ConsumeAcervoGeralApi(
                             continue; // Volta para o início do loop para pedir o código novamente
                         }
                         console.log('[Login] Clique realizado. Verificando sucesso do login...');
+                        mainWindow.webContents.send('progress-messages', { message: `Código MFA inserido com sucesso, aguardando resposta do PJE...` });
                         mfaCodeValid = true; // <-- QUEBRA O LOOP
 
+                    } // FIM DO WHILE
+
+                    if (!mfaCodeValid && attempts >= 5) {
+                        throw new Error("Falha no login MFA após 5 tentativas. Verifique se a Chave Secreta na planilha está correta.");
                     }
+
                     // O robô agora está logado e pode continuar o scrape...
                 }
             }
 
+            mainWindow.webContents.send(
+                'progress-messages',
+                `Buscando dados no TRT-${trt}...`
+            );
 
 
             // CATCH PARA ERRO DE AUTENTICAÇÃO
         } catch (error) {
 
             console.log('erro de autenticação')
+            mainWindow.webContents.send('progress-messages', { message: `Ocorreu um erro de autenticação no TRT-${trt}, seguindo para o próximo da lista...` });
 
             const identifier: excelDataIdentified["identifier"] = {
                 trt: `TRT-${trt}`,
@@ -158,6 +199,7 @@ export async function ConsumeAcervoGeralApi(
 
         try {
             await page.waitForSelector('#brasao-republica', { visible: true })
+            mainWindow.webContents.send('progress-messages', { message: `🔑🔑🔑 TRT-${trt} autenticado com sucesso, fazendo a busca do acervo geral...` });
 
         } catch (error) {
 
@@ -292,7 +334,7 @@ export async function ConsumeAcervoGeralApi(
                     descricaoOrgaoJulgador: unescape(audit.descricaoOrgaoJulgador),
                     nomeParteAutora: unescape(audit.nomeParteAutora),
                     nomeParteRe: unescape(audit.nomeParteRe),
-                    dataAutuacao: unescape(audit.dataArquivamento),
+                    dataAutuacao: unescape(audit.dataAutuacao),
                 });
             });
 

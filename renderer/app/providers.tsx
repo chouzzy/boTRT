@@ -14,17 +14,21 @@ import { LoadingProvider } from "renderer/contexts/LoadingContext"
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <ChakraProvider value={system}>
-      <ColorModeProvider>
-        <ThemeProvider attribute="class" disableTransitionOnChange>
-          <Auth0ProviderForDesktop>
-            <AuthProvider>
-              <LoadingProvider>
-                {props.children}
-              </LoadingProvider>
-            </AuthProvider>
-          </Auth0ProviderForDesktop>
-        </ThemeProvider>
-      </ColorModeProvider>
+      <ThemeProvider
+        attribute="class"
+        disableTransitionOnChange
+        defaultTheme="dark"
+        enableSystem={false}
+        forcedTheme="dark"
+      >
+        <Auth0ProviderForDesktop>
+          <AuthProvider>
+            <LoadingProvider>
+              {props.children}
+            </LoadingProvider>
+          </AuthProvider>
+        </Auth0ProviderForDesktop>
+      </ThemeProvider>
     </ChakraProvider>
   )
 }
