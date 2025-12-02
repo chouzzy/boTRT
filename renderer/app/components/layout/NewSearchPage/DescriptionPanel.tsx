@@ -95,6 +95,7 @@ export function LogDisplay({ logs }: LogDisplayProps) {
                 align="flex-start"
                 overflowY="auto"
                 gap={2}
+                maxH={500}
             >
                 <AnimatePresence>
                     {logs.map((log, index) => {
@@ -112,6 +113,7 @@ export function LogDisplay({ logs }: LogDisplayProps) {
                                 display="flex"
                                 alignItems="center"
                                 width="100%"
+                                
                             >
                                 {/* Lógica de Ícone Condicional */}
                                 {isLast && (log != 'Arquivo salvo com sucesso!') && (!log.startsWith('Busca finalizada!')) && (!log.startsWith('⚠️⚠️⚠️ Nenhum processo encontrado')) ? (

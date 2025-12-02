@@ -113,7 +113,7 @@ export async function consumeMinhaPautaApi(
                         if (timeRemaining < 5) {
                             console.log(`[Login] Código expirando em ${timeRemaining}s. Aguardando próximo...`);
                             mainWindow.webContents.send('progress-messages', { message: `Sincronizando relógio do código...` });
-                            await new Promise(r => setTimeout(r, (timeRemaining + 1) * 1000));
+                            await new Promise(r => setTimeout(r, (timeRemaining + 1) * 3000));
                         }
 
                         const token = totp.generate();
@@ -126,17 +126,17 @@ export async function consumeMinhaPautaApi(
                         });
                         // Digita devagar para o JS pegar
                         await page.type('::-p-xpath(//*[@id="otp"])', token, { delay: 100 });
-                        await new Promise(r => setTimeout(r, 500));
+                        await new Promise(r => setTimeout(r, 5000));
 
                         // 8. Clica para logar e espera a resposta
                         console.log('[Login] Clicando no login após inserir o MFA...');
                         await Promise.all([
-                            page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 }),
+                            page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 }),
                             page.click('::-p-xpath(//*[@id="kc-login"])')
                         ]);
 
                         try {
-                            await page.waitForSelector('#brasao-republica', { visible: true, timeout: 3000 });
+                            await page.waitForSelector('#brasao-republica', { visible: true, timeout: 30000 });
                         } catch (error) {
                             console.log('[Login] Falha no login com o código MFA fornecido. Tentando novamente...');
                             mainWindow.webContents.send('progress-messages', { message: `🛑🛑🛑 Código MFA inválido. Por favor, tente novamente.` });

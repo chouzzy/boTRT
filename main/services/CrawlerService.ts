@@ -359,6 +359,8 @@ function addDataToWorksheet(worksheet: exceljs.Worksheet, data: excelDataIdentif
                 nomeParteRe: item.nomeParteRe, // Ajuste
                 dataAutuacao: moment(item.dataAutuacao).format('DD/MM/YYYY')
             });
+
+            console.log(`Adicionando processo ${item.numeroProcesso} à planilha. Data de autuação: ${item.dataAutuacao}, data formatada: ${moment(item.dataAutuacao).format('DD/MM/YYYY')}`);
         });
     }
     // Adicione um estilo básico ao cabeçalho

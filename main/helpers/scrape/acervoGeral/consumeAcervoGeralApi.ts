@@ -334,7 +334,7 @@ export async function ConsumeAcervoGeralApi(
                     descricaoOrgaoJulgador: unescape(audit.descricaoOrgaoJulgador),
                     nomeParteAutora: unescape(audit.nomeParteAutora),
                     nomeParteRe: unescape(audit.nomeParteRe),
-                    dataAutuacao: unescape(audit.dataArquivamento),
+                    dataAutuacao: unescape(audit.dataAutuacao),
                 });
             });
 
